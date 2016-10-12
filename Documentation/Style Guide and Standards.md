@@ -4,8 +4,11 @@ This guide is an attempt to have a single answer as to how this project should b
 It covers a large range of stylistic decisions, ranging from general file layout to variable naming.
 Both code and documentation of all forms are covered.
 
+Since its inception, this guide has also been expanded such that it covers coding standards.
+
 Note that this guide is not intended to be the answer to everything in life;
 it is purely to keep these files consistent.
+If you disagree with these points, feel free to ignore them for your own projects.
 
 
 #General Notes
@@ -34,10 +37,9 @@ it is purely to keep these files consistent.
 	+ Changing the tab width should not break anything under any circumstances.
 + Tabs and spaces are to be mixed if called for in the situation.
 
-+ Constants should not use #define statements. Enums and consts should be used instead.
++ Constants should not use ```#define``` statements. ```enum``` and ```const``` should be used instead.
 
-+ Enums should be used whenever they make sense. This includes where there are only two states.
-+ Enums should always be defined using the "typedef" keyword.
++ Enumerations should always be defined using the ```typedef``` keyword.
 
 
 #Header Files
@@ -52,7 +54,7 @@ it is purely to keep these files consistent.
 + Sections should be in the following order:
 	1. CONFIGURATION VARIABLES
 	2. PIN DEFINITIONS
-	3. ENUMS
+	3. ENUMERATIONS
 	4. [other misc sections, as needed]
 	5. AVAILABLE FUNCTIONS
 	6. INTERNAL FUNCTIONS
@@ -74,6 +76,30 @@ it is purely to keep these files consistent.
 + Functions that do actions should be in the form verb - noun.
 + Functions that return a boolean should in the form noun - adjective.
 
+
+#Data Types and Usage
+
++ These data types should not be used:
+	+ ```boolean``` (```bool``` should be used instead)
+	+ ```short``` and ```unsigned short```
+	+ ```word```
+	+ ```unsigned char``` (unless potentially storing extended ASCII)
+
++ Variables storing exclusively ASCII characters should always be type ```char```.
++ Unsigned variables that are highly unlikely to approach 255 should be of the type ```byte```.
+	+ This type may be used to implicitly limit values, so long as the maximum value is not critical.
++ Similarly, variables that are highly unlikely to approach maximum values should be of type
+  ```int``` or ```unsigned int```.
++ Values that may potentially become larger than ```int``` would allow should use ```long```
+  or ```unsigned long```.
+	+ The ```unsigned long``` type should be used for all variables dealing with timing,
+	  with the exception of 
+
++ Unsigned types should be used if the variable cannot logically take a negative value.
++ Explicit data types (such as ```uint8_t```) should be used if the bit width is critical.
+	+ If the value in question would be written on paper in base 2 or 16, these types should be used.
+	+ Absolute pointers should always use unsigned explicit data types.
++ Enumerations should be used whenever they make sense. This includes where there are only two states.
 
 #Documentation and Comments
 
