@@ -63,7 +63,7 @@ const byte ISD_WR_APC2 = 0x65;
 const byte ISD_SET_PLAY = 0x80;
 
 // ISD1700 configuration data
-const uint16_t ISD_AUDIO_CONFIG = B0000010010100000;
+const uint16_t ISD_APC_DEFAULT_CONFIG = B0000010010100000;
 
 // ISD1700 audio pointer array
 // In format [START_1], [END_1], [START_2], etc...
@@ -125,7 +125,7 @@ bool audioPlaying();
 // INTERNAL FUNCTIONS
 /////////////////////////
 
-void configureAudio(uint16_t configuration);
+void configAudio(uint16_t configuration);
 /*
  * Configures the ISD1700 device
  * Can be used to change volume

@@ -6,7 +6,7 @@ void initAudio() {
 	// TODO
 	// Set pins to outputs, using pull-up resistors
 	// Set SPI_SS_PIN and SPI_SCLK_PIN high, and SPI_MOSI_PIN low
-	configureAudio(ISD_AUDIO_CONFIG);
+	configAudio(ISD_APC_DEFAULT_CONFIG);
 	return;
 }
 
@@ -48,7 +48,7 @@ bool audioPlaying() {
 	return(Audio_State == AUDIO_STATE_PLAYING);
 }
 
-void configureAudio(configuration) {
+void configAudio(configuration) {
 	// Set SPI_SS_PIN to LOW
 	sendByte(WR_APC2);
 	sendByte(getByte(configuration, 0));
@@ -59,6 +59,7 @@ void configureAudio(configuration) {
 
 void sendByte(transmission) {
 	for(byte i = 0; i < 8; i++) {
+		// TODO
 		// Set SPI_SCLK_PIN to LOW
 		// Set SPI_MOSI_PIN to ((transmission >> i) && 0x01)
 		// Set SPI_SCLK_PIN to HIGH

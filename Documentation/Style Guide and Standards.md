@@ -76,6 +76,37 @@ If you disagree with these points, feel free to ignore them for your own project
 + Functions that do actions should be in the form verb - noun.
 + Functions that return a boolean should in the form noun - adjective.
 
++ In general, "Begin" should be used for actions, and "Start" for locations.
+	+ "End" is the preferred complement to "Begin".
+	+ "Stop" is the preferred complement to "Start".
+	+ These terms may be changed if context makes them ambiguous, implies another use,
+	  or is contrary to external documentation.
+		+ For example, ```sendEndCommand()``` should be renamed if the command "STOP" is being sent.
+
+
+#Abbreviations
+
++ Easily-understood abbreviations should be used when practical. Some examples are:
+	+ "Str" for "String"
+	+ "Curr" for "Current"
+	+ "Prev" for "Previous"
+	+ "Init" for "Initialize"
+	+ "Config" for "Configuration" or "Configure"
+	+ "Cal" for "Calibration" or "Calibrate"
++ Uncommon and arbitrary abbreviations should only be used if unambiguous in their context.
+  Some examples:
+	+ "Int" for "Interrupt", in the case of "CHIP_INT_PIN"
+	+ "Dir" for "Direction", in the case of "Motor_Dir"
+	+ "SS" for "Slave Select", in the case of "SPI_SS_PIN"
+
++ Function names should remain unabbreviated if doing so reduces readability. For example:
+	+ "getRecordingDuration()" should not be abbreviated to "getRecDur()".
+	+ "calibrateAudioInput()" should not be abbreviated to "calAudioIn()".
+
++ The abbreviations "In" and "Out" should only be used at the end of names.
+	+ For example, "In_Data" is ambiguous without determining the data type,
+	  whereas "Data_In" clearly represents input data.
+
 
 #Data Types and Usage
 
@@ -98,8 +129,14 @@ If you disagree with these points, feel free to ignore them for your own project
 + Unsigned types should be used if the variable cannot logically take a negative value.
 + Explicit data types (such as ```uint8_t```) should be used if the bit width is critical.
 	+ If the value in question would be written on paper in base 2 or 16, these types should be used.
+		+ An exception can be made if the value is used to mask a value of a non-explicit type.
 	+ Absolute pointers should always use unsigned explicit data types.
-+ Enumerations should be used whenever they make sense. This includes where there are only two states.
++ Enumerations should be used whenever they make sense.
+	+ If only two states exist, an enumeration should still be used unless the value is a boolean.
+		+ For example, "Motor_Direction" should be an enumeration, and "Motor_Enabled" a boolean.
+		  This enumeration might be avoided by changing "Motor_Direction" to "Motor_Forward".
+		  However, using a boolean in this case implies a different usage,
+		  and should therefore not be changed.
 
 #Documentation and Comments
 
@@ -129,7 +166,7 @@ If you disagree with these points, feel free to ignore them for your own project
 	 * [Optional] additional information goes here. There may be multiple of these sections.
 	 *
 	 * [The following lines are to be used as needed.]
-	 * Affects Variable_A and Variable_B
+	 * Affects Global_Variable_A and Global_Variable_B
 	 * INPUT:  Argument 1 description (X-indexed)
 	 *         Argument 2 description
 	 * OUTPUT: Return description
