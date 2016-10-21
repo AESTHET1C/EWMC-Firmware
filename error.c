@@ -31,16 +31,14 @@ void handleErrors() {
 	return;
 }
 
-void setErrorCode(error) {
-	if(error == ERROR_CODES) {  // Critical error
+void setErrorCode(byte error, bool active) {
+	if(error == 0) {
+		return;
+	}
+	else if(error == CRITICAL_ERROR) {
 		clearErrorCodes();
 	}
-	Error_Status[error] = true;
-	return;
-}
-
-void clearErrorCode(error) {
-	Error_Status[error] = false;
+	Error_Status[error - 1] = active;
 	return;
 }
 

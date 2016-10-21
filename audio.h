@@ -21,8 +21,8 @@
 /////////////////////////
 
 // Audio clip durations
-const int AUDIO_BEEP_DURATION = [TODO];
-const int AUDIO_DURATION = [TODO];       // All clips other than beep
+const unsigned int AUDIO_BEEP_DURATION = [TODO];
+const unsigned int AUDIO_DURATION = [TODO];       // All clips other than beep
 
 
 /////////////////////////
@@ -35,7 +35,7 @@ const byte SPI_SS_PIN = 8;
 
 
 /////////////////////////
-// ENUMS
+// ENUMERATIONS
 /////////////////////////
 
 // Available audio clips
@@ -133,7 +133,7 @@ void configAudio(uint16_t configuration);
  * INPUT:  configuration bytes to use
  */
 
-void sendByte(byte transmission);
+void sendByte(uint8_t transmission);
 /*
  * Sends a single byte via SPI to the ISD1700
  * SPI_SS pin must still be manually set before and after a command

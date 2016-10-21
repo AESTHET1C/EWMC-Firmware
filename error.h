@@ -34,8 +34,9 @@
 /////////////////////////
 
 const byte ERROR_CODES = 10;
-const int ERROR_CYCLE_TIME = 500;
-const int ERROR_BLINK_TIME = 250;
+const byte CRITICAL_ERROR = ERROR_CODES;
+const unsigned int ERROR_CYCLE_TIME = 500;
+const unsigned int ERROR_BLINK_TIME = 250;
 
 
 /////////////////////////
@@ -67,20 +68,13 @@ void handleErrors();
  * Affects cycleStart, currentCycle, and currentCycleGoal
  */
 
-void setErrorCode(byte error);
+void setErrorCode(byte error, bool active);
 /*
  * Sets a single error code
  *
  * Affects errors[]
- * INPUT:  Error code to set (0-indexed)
- */
-
-void clearErrorCode(byte error);
-/*
- * Clears a single error code
- *
- * Affects errors[]
- * INPUT:  Error code to clear (0-indexed)
+ * INPUT:  Error code to set (1-indexed)
+ *         Is the error active?
  */
 
 void clearErrorCodes();

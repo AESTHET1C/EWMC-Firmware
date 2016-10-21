@@ -16,17 +16,10 @@ void initPowerOutputs() {
 	return;
 }
 
-void enablePowerOutput(output) {
+void setPowerOutput(byte output, bool enable) {
 	// TODO
-	// Enable motor pin
-	Power_Output_Enabled[output] = true;
-	return;
-}
-
-void disablePowerOutput(output) {
-	// TODO
-	// Disable motor pin
-	Power_Output_Enabled[output] = false;
+	// Set motor pin
+	Power_Output_Enabled[output] = enable;
 	return;
 }
 
@@ -34,6 +27,16 @@ void setPowerOutputPWM(byte motor, byte power) {
 	// TODO
 	// Calculate affected timer configuration register
 	// Set timer register
+	return;
+}
+
+void reverseMotor(byte motor) {
+	if(getMotorDir(motor) == FORWARD) {
+		setMotorDir(motor, BACKWARD);
+	}
+	else {
+		setMotorDir(motor, FORWARD);
+	}
 	return;
 }
 
@@ -45,10 +48,19 @@ void setMotorDir(byte motor, motor_dir dir){
 	return;
 }
 
-bool powerOutputEnabled(output) {
+motor_dir getMotorDir(byte motor) {
+	return(Motor_Dir[motor]);
+}
+
+bool powerOutputEnabled(byte output) {
 	return(Power_Output_Enabled[output]);
 }
 
-motor_dir getMotorDir(motor) {
-	return(Motor_Dir[motor]);
+bool otherMotorsEnabled(byte motor) {
+	for(byte test_motor = 0; test_motor < 3; test_motor++) {
+		if((motor != test_motor) && (powerOutputEnabled(test_motor))) {
+			return true;
+		}
+	}
+	return false;
 }

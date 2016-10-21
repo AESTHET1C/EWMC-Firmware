@@ -10,8 +10,8 @@ void initAudio() {
 	return;
 }
 
-void playAudio(sound) {
-	// Set SPI_SS_PIN to LOW
+void playAudio(audio_clip sound) {
+	DigitalWrite(SPI_SS_PIN, LOW);
 	sendByte(SET_PLAY);
 	sendByte(0x00);
 	sendByte(getByte(ISD_AUDIO_PTR[sound * 2], 0));
@@ -19,15 +19,15 @@ void playAudio(sound) {
 	sendByte(getByte(ISD_AUDIO_PTR[(sound * 2) + 1], 0));
 	sendByte(getByte(ISD_AUDIO_PTR[(sound * 2) + 1], 1));
 	sendByte(0x00);
-	// Set SPI_SS_PIN to HIGH
+	DigitalWrite(SPI_SS_PIN, HIGH);
 	return;
 }
 
 void stopAudio() {
-	// Set SPI_SS_PIN to LOW
+	DigitalWrite(SPI_SS_PIN, LOW);
 	sendByte(STOP);
 	sendByte(0x00);
-	// Set SPI_SS_PIN to HIGH
+	DigitalWrite(SPI_SS_PIN, HIGH);
 	Audio_State = AUDIO_STATE_READY;
 	return;
 }
@@ -48,25 +48,24 @@ bool audioPlaying() {
 	return(Audio_State == AUDIO_STATE_PLAYING);
 }
 
-void configAudio(configuration) {
-	// Set SPI_SS_PIN to LOW
+void configAudio(uint16_t configuration) {
+	DigitalWrite(SPI_SS_PIN, LOW);
 	sendByte(WR_APC2);
 	sendByte(getByte(configuration, 0));
 	sendByte(getByte(configuration, 1));
-	// Set SPI_SS_PIN to HIGH
+	DigitalWrite(SPI_SS_PIN, HIGH);
 	return;
 }
 
-void sendByte(transmission) {
+void sendByte(uint8_t transmission) {
 	for(byte i = 0; i < 8; i++) {
-		// TODO
-		// Set SPI_SCLK_PIN to LOW
-		// Set SPI_MOSI_PIN to ((transmission >> i) && 0x01)
-		// Set SPI_SCLK_PIN to HIGH
+		DigitalWrite(SPI_SCLK_PIN, LOW);
+		DigitalWrite(SPI_MOSI_PIN, ((transmission >> i) && 0x01));
+		DigitalWrite(SPI_SCLK_PIN, HIGH);
 	}
 	return;
 }
 
-byte getByte(input, byteSelect) {
+byte getByte(uint16_t input, byte byteSelect) {
 	return((input >> (8 * byteSelect)) && 0xFF);
 }

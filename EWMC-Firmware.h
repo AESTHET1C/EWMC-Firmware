@@ -1,4 +1,4 @@
-/* Main Module
+/* EWMC Firmware
  *
  * Allows for interactive control of the coal mine module
  *
@@ -20,12 +20,22 @@
 // CONFIGURATION VARIABLES
 /////////////////////////
 
-// Calibration routine
-const int CAL_DELAY = 3000;     // Delay between stage 1 and 2
-const int CAL_TIMEOUT = 10000;  // Default motor timeout for stage 2
+const unsigned int DEBOUNCE_DELAY = 100;
 
-// Motor operation
-const int ENDSTOP_DELAY = 1000;  // Delay between motor movement to error 10 eligibility
+// Motor stage delays
+const unsigned int MOTOR_DIR_DELAY_PRE = 100;
+const unsigned int MOTOR_DIR_DELAY_POST = 150;
+const unsigned int MOTOR_SAFETY_REVERSE = 2000;
+const unsigned int MOTOR_SAFETY_REVERSE_ERR_10_DELAY = 1000;
+
+// Calibration delays
+const unsigned int CAL_STAGE_DELAY = 3000;
+const unsigned int CAL_TIMEOUT = 10000;
+const unsigned int CAL_ERR_10_DELAY = 1000;
+
+const byte TIMEOUT_FACTOR = 150;  // Percentage of expected travel time before timeout
+const byte SLOWDOWN_FACTOR = 95;  // Percentage of expected travel time before slowing
+const byte ERR_10_FACTOR = 10;
 
 
 /////////////////////////
@@ -43,44 +53,41 @@ const byte BUTTON_PIN = 12;
 
 
 /////////////////////////
-// ENUMS
+// ENUMERATIONS
 /////////////////////////
 
 // Available sensors
 typedef enum sensor_group {
-	ENDSTOP_NONE,
-	ENDSTOP_1,
-	ENDSTOP_2,
-	ENDSTOP_3,
-	ENDSTOP_4,
-	ENDSTOP_5,
-	ENDSTOP_6,
-	ENDSTOP_MOTOR_1,
-	ENDSTOP_MOTOR_2,
-	ENDSTOP_MOTOR_3,
-	ENDSTOP_ANY,
-	BUTTON
-};
-
-// Calibration (stage 1) states
-typedef enum cal_state {
-	WAIT,
-	MANUAL_1,
-	MANUAL_2,
-	MANUAL_3,
-	DELAY,
-	AUTO_1,
-	AUTO_2
+	BUTTON = 0,
+	ENDSTOP_1 = 1,
+	ENDSTOP_2 = 2,
+	ENDSTOP_3 = 3,
+	ENDSTOP_4 = 4,
+	ENDSTOP_5 = 5,
+	ENDSTOP_6 = 6,
+	ENDSTOP_NONE = 7,
+	ENDSTOP_MOTOR_1 = 8,
+	ENDSTOP_MOTOR_2 = 9,
+	ENDSTOP_MOTOR_3 = 10,
+	ENDSTOP_ANY = 11
 };
 
 // Motor general operation states
 typedef enum motor_state {
-	FAULTED,
+	IDLE,
+	FORWARD_START,
 	FORWARD,
-	DELAY_1,
-	REVERSE,
-	DELAY_2,
-	PASSED
+	FORWARD_NEAR,
+	DELAY_PRE_F_B,
+	DELAY_POST_F_B,
+	BACKWARD_START,
+	BACKWARD,
+	BACKWARD_NEAR,
+	DELAY_PRE_B_F,
+	DELAY_POST_B_F,
+	SAFETY_REVERSE_FAILURE,
+	SAFETY_REVERSE_EARLY,
+	FAULTED
 };
 
 

@@ -79,11 +79,13 @@ Errors 1-6:
 		-etc...
 	Trigger Conditions:
 		-The corresponding motor takes more time than expected to engage the endstop in question
+		-The endstop in question was disengaged while the corresponding motor was stationary
 	Potential Causes:
 		-The endstop in question has failed
 		-The motor in question needs to be re-calibrated
+		-The endstop was disengaged manually
 	Action Taken by Firmware:
-		-The corresponding motor is reversed briefly
+		-The corresponding motor is reversed briefly if it was in motion
 		-The corresponding motor is disabled until reset
 	What To Do:
 		-Verify the endstop in question is fully plugged in
@@ -99,11 +101,12 @@ Errors 7-9:
 		-Error 9 corresponds to the clamshell
 	Trigger Conditions:
 		-The corresponding motor takes less time than expected to engage the endstop it was travelling toward
+		-An endstop is engaged upon powerup, before calibration begins
 	Potential Causes:
 		-The motor in question needs to be re-calibrated
 		-The endstop was engaged manually
 	Action Taken by Firmware:
-		-The corresponding motor is reversed briefly
+		-The corresponding motor is reversed briefly if it was in motion
 		-The corresponding motor is disabled until reset
 	What To Do:
 		-Reset the EWMC board
@@ -113,9 +116,10 @@ Error 10:
 	Overview:
 		-An endstop was engaged erraneously
 	Trigger Conditions:
+		-Any pair of endstops engages simultaneously
 		-Any endstop engages while the corresponding motor is travelling in the wrong direction
 		-Any endstop engages while the corresponding motor is stationary but any other motor is moving
-		-Any pair of endstops engages simultaneously
+		-Any endstop engages while the corresponding motor is reversing during errors 1-6
 		-The endstop in question fails to disengage while the motor reverses during errors 7-9
 	Potential Causes:
 		-The endstops are plugged in incorrectly

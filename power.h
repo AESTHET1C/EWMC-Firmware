@@ -6,7 +6,7 @@
  * The three motors also allow for directionality control.
  *
  * It is expected that motors are disabled for a short while before and after switching directions.
- * These delays are to be handled elsewhere, but their time constants can be found here.
+ * These delays are to be handled elsewhere.
  *
  * Written by Alex Tavares <tavaresa13@gmail.com>
  */
@@ -20,13 +20,9 @@
 /////////////////////////
 
 // PWM presets
-const byte PWM_SPEED_SLOW = [TODO];
-const byte PWM_SPEED_FAST = [TODO];
-const byte PWM_MAGNET = [TODO];
-
-// Motor direction change delays
-const int MOTOR_DIR_DELAY_PRE = 100;
-const int MOTOR_DIR_DELAY_POST = 150;
+const uint8_t PWM_SPEED_SLOW[3] = [TODO];
+const uint8_t PWM_SPEED_FAST[3] = [TODO];
+const uint8_t PWM_MAGNET = [TODO];
 
 
 /////////////////////////
@@ -38,7 +34,7 @@ const byte POWER_PWM_PIN[4] = {9, 10, 11, 3};
 
 
 /////////////////////////
-// ENUMS
+// ENUMERATIONS
 /////////////////////////
 
 typedef enum motor_dir {
@@ -62,19 +58,11 @@ void initPowerOutputs();
  * Affects Power_Output_Enabled and Motor_Dir
  */
 
-void enablePowerOutput(byte output);
+void setPowerOutput(byte output, bool enable);
 /*
- * Enables a power output
+ * Enables or disables a power output
  *
- * Affects Power_Output_Enabled
- * INPUT:  Output in question (0-indexed)
- */
-
-void disablePowerOutput(byte output);
-/*
- * Disables a power output
- *
- * Affects Power_Output_Enabled
+ * Affects Power_Output_Enabled[]
  * INPUT:  Output in question (0-indexed)
  */
 
@@ -86,13 +74,29 @@ void setPowerOutputPWM(byte motor, byte power);
  *         New output power
  */
 
+void reverseMotor(byte motor);
+/*
+ * Reverses the direction of a given motor
+ *
+ * Affects Motor_Dir[]
+ * INPUT:  Motor (0-indexed)
+ */
+
 void setMotorDir(byte motor, motor_dir dir);
 /*
  * Sets the direction of a given motor
  *
- * Affects Motor_Dir
+ * Affects Motor_Dir[]
  * INPUT:  Motor (0-indexed)
  *         New direction
+ */
+
+motor_dir getMotorDir(byte motor);
+/*
+ * Gets the current direction of a motor
+ *
+ * INPUT:  Motor (0-indexed)
+ * OUTPUT: Direction of motor
  */
 
 bool powerOutputEnabled(byte output);
@@ -103,12 +107,13 @@ bool powerOutputEnabled(byte output);
  * OUTPUT: State of being enabled
  */
 
-motor_dir getMotorDir(byte motor);
+bool otherMotorsEnabled(byte motor);
 /*
- * Gets the current direction of a motor
+ * Determines if any other motors are currently moving
+ * Used to determine critical errors
  *
- * INPUT:  Motor (0-indexed)
- * OUTPUT: Direction of motor
+ * INPUT:  Current [known stationary] motor
+ * OUTPUT: Is any motor enabled?
  */
 
 

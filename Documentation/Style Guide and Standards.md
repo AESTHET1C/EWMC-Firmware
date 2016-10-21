@@ -117,7 +117,7 @@ Global variables and constants should be named such that their originating modul
 
 ---
 
-In general, "Begin" should be used for actions, and "Start" for locations.
+In general, "Begin" should be used for actions, and "Start" for locations and times.
 
 + "End" is the preferred complement to "Begin".
 + "Stop" is the preferred complement to "Start".
@@ -183,17 +183,22 @@ These data types should not be used:
 
 ---
 
+Variables should always specify a type upon declaration.
+	+ Variables should be initialized on declaration only if a default value is logical.
+	  For example, if the variable is assigned several lines down by a function that checks for validity and there is no possible branch operation or attempted use of the variable before this assignment, the initial declaration does not need to be initialized.
+	+ Type should not be specified on subsequent assignments.
++ The `typedef` keyword should be used when defining enumerations.
+
+---
+
 Constants should not use `#define` statements. A `const` or enumeration should be used instead.
 
 ---
 
 Enumerations should be used whenever they make sense.
 
-+ The `typedef` keyword should be used.
 + If only two states exist, an enumeration should still be used unless the value is a boolean.
-	+ For example, "Motor_Direction" should be an enumeration, and "Motor_Enabled" a boolean.
-	  In this example, the use of an enumeration could be avoided by renaming "Motor_Direction" to "Motor_Forward".
-	  However, this should not be done as the name "Motor_Forward" implies the motor is also enabled.
+	+ For example, "Motor_Direction" should be an enumeration, and "Motor_Enabled" a boolean. In this example, the use of an enumeration could be avoided by renaming "Motor_Direction" to "Motor_Forward". However, this should not be done as the name "Motor_Forward" implies the motor is also enabled.
 
 
 #Documentation and Comments
