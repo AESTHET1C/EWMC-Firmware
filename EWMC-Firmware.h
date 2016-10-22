@@ -5,8 +5,6 @@
  * See the EWMC Firmware documentation for details.
  *
  * State machines are used to keep track of all motors independently, using non-blocking code.
- * Each controlled device uses its own switch statement(s) and enum(s) for this, running in a loop.
- * Button presses are handled individually by each controlled device.
  * The electromagnet is grouped in operation with the clamshell motor.
  *
  * Written by Alex Tavares <tavaresa13@gmail.com>
@@ -21,7 +19,7 @@
 /////////////////////////
 
 // Debounce delays of the arcade button and all 6 endstops
-// Follows the order of enum sensor_group
+// Follows the order of the enum sensor_group
 // Endstop delays larger than MOTOR_DIR_DELAY_X will be shortened
 const unsigned int DEBOUNCE_DELAY[7] = {100, 50, 50, 50, 50, 50, 50};
 

@@ -55,7 +55,7 @@ void initErrors();
  * Initializes error code handling
  * Must be called at startup
  *
- * Initialization involes setting status variables and pin configuration.
+ * Initialization involves setting status variables and pin configuration.
  *
  * Affects errors[], cycleStart, currentCycle, and currentCycleGoal
  */
