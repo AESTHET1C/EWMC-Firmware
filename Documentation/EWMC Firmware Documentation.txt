@@ -10,7 +10,7 @@ The Eli Whitney Mine Controller (EWMC) is an ATmega 328P-powered board that atta
 -Power the electromagnet within the clamshell bucket to pick up objects
 -Play multiple short sound effects at random intervals while the arcade button is being pressed
 
-The Firmware also utilizes dual endstop sensors per motor along with an optional startup calibration routine to prevent erraneous motor control. In the event that a malfunction does happen, the Firmware will disable the operation of the affected motor and display an error code on the EWMC board's LED.
+The Firmware also utilizes dual endstop sensors per motor along with an optional startup calibration routine to prevent erroneous motor control. In the event that a malfunction does happen, the Firmware will disable the operation of the affected motor and display an error code on the EWMC board's LED.
 
 
 SETUP CHECKLIST
@@ -23,7 +23,7 @@ SETUP CHECKLIST
 
 CALIBRATION
 
-Note: When re-powering the board without having unplugged anything, no action by the staff is needed. The calibration routine is skipped when the arcade button is pressed.
+Note: When re-powering the board without having unplugged anything, no action by the staff is needed. The calibration routine is skipped when the arcade button is pressed before any motors are powered.
 
 Calibration is needed whenever endstops or motors have been unplugged since the last power-up. It is used to ensure endstops are plugged in correctly and are working, and to establish sanity checks for normal operation. Upon completion of calibration, these values are stored to non-volatile memory. If calibration is skipped, the last known values are used. The calibration routine is started upon the reset of the EWMC board and has two stages:
 
@@ -41,7 +41,7 @@ Stage 2 - Automated Calibration:
 	2: Each motor cycles at full speed to each endstop.
 	3: Calibration data is stored in non-volatile memory.
 
-	This stage determines the locations of each endstop and the average travel time of each motor in both directions. These values are used during normal operation to determine erraneous endstop operation and motor failures. Note that while safety timers are in place to prevent destructive movements, it is suggested to verify correct operation during this stage and remove power if an endstop fails to engage. Once this stage is completed, the Firmware continues to normal operation.
+	This stage determines the locations of each endstop and the average travel time of each motor in both directions. These values are used during normal operation to determine erroneous endstop operation and motor failures. Note that while safety timers are in place to prevent destructive movements, it is suggested to verify correct operation during this stage. In the event that a motor is making a potentially destructive movement, simply press the arcade button. If this button is pressed, a critical error will be asserted, and all motors halted. Once this stage is completed, the Firmware continues to normal operation.
 
 
 WIRING CONNECTIONS
@@ -64,7 +64,7 @@ The eight low-power connections are located on the bottom left of the EWMC board
 -Arcade button
 -Speaker
 
-All low-power connections are in non-polarized vertical pairs. Attaching connectors horizontally may cause damage to the EWMC board or the coal mine module. The two endstops for each motor are interchangable; they will be automatically detected during calibration. If a connector will not plug in fully, check that it is not crooked.
+All low-power connections are in non-polarized vertical pairs. Attaching connectors horizontally may cause damage to the EWMC board or the coal mine module. The two endstops for each motor are interchangeable; they will be automatically detected during calibration. If a connector will not plug in fully, check that it is not crooked.
 
 
 ERROR CODES
@@ -89,6 +89,7 @@ Errors 1-6:
 		-The corresponding motor is disabled until reset
 	What To Do:
 		-Verify the endstop in question is fully plugged in
+		-Verify the endstop in question is positioned correctly
 		-Replace or readjust the endstop in question if needed
 		-Reset the EWMC board
 		-Recalibrate if needed
@@ -100,8 +101,8 @@ Errors 7-9:
 		-Error 8 corresponds to the mine cart
 		-Error 9 corresponds to the clamshell
 	Trigger Conditions:
-		-The corresponding motor takes less time than expected to engage the endstop it was travelling toward
-		-An endstop is engaged upon powerup, before calibration begins
+		-The corresponding motor takes less time than expected to engage the endstop it was traveling toward
+		-An endstop is engaged upon power up, before calibration begins
 	Potential Causes:
 		-The motor in question needs to be re-calibrated
 		-The endstop was engaged manually
@@ -112,18 +113,21 @@ Errors 7-9:
 		-Reset the EWMC board
 		-Recalibrate if needed
 
-Error 10:
+Error 10 (Critical error):
 	Overview:
-		-An endstop was engaged erraneously
+		-An endstop was engaged erroneously
+		-An unrecoverable error was triggered
 	Trigger Conditions:
 		-Any pair of endstops engages simultaneously
-		-Any endstop engages while the corresponding motor is travelling in the wrong direction
+		-Any endstop engages while the corresponding motor is traveling in the wrong direction
 		-Any endstop engages while the corresponding motor is stationary but any other motor is moving
-		-Any endstop engages while the corresponding motor is reversing during errors 1-6
+		-Either endstop engages while the corresponding motor is reversing during errors 1-6
 		-The endstop in question fails to disengage while the motor reverses during errors 7-9
+		-The arcade button was pressed during stage 2 of calibration
 	Potential Causes:
 		-The endstops are plugged in incorrectly
 		-The endstop was engaged manually
+		-The arcade button was pressed during stage 2 of calibration
 	Action Taken by Firmware:
 		-All motors are disabled until reset
 	What To Do:

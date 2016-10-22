@@ -60,7 +60,7 @@ void initErrors();
  * Affects errors[], cycleStart, currentCycle, and currentCycleGoal
  */
 
-void handleErrors();
+void handleErrorCodeDisplay();
 /*
  * Updates the EWMC status LED to display error codes
  * Must be placed within a loop that executes regularly
@@ -68,16 +68,15 @@ void handleErrors();
  * Affects cycleStart, currentCycle, and currentCycleGoal
  */
 
-void setErrorCode(byte error, bool active);
+void flagError(byte error);
 /*
- * Sets a single error code
+ * Sets a single error code to true
  *
  * Affects errors[]
  * INPUT:  Error code to set (1-indexed)
- *         Is the error active?
  */
 
-void clearErrorCodes();
+void clearErrors();
 /*
  * Clears all error codes
  *
@@ -90,9 +89,9 @@ void clearErrorCodes();
 /////////////////////////
 
 byte getBlinksNext(blinks_prev);
-/* 
+/*
  * Scans through active errors and determines the next one to display
- * Used by handleErrors()
+ * Used by handleErrorCodeDisplay()
  *
  * INPUT:  Previous displayed error (1-indexed)
  * OUTPUT: Next error to display (1-indexed)

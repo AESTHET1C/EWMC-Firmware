@@ -20,12 +20,15 @@
 // CONFIGURATION VARIABLES
 /////////////////////////
 
-const unsigned int DEBOUNCE_DELAY = 100;
+// Debounce delays of the arcade button and all 6 endstops
+// Follows the order of enum sensor_group
+// Endstop delays larger than MOTOR_DIR_DELAY_X will be shortened
+const unsigned int DEBOUNCE_DELAY[7] = {100, 50, 50, 50, 50, 50, 50};
 
 // Motor stage delays
 const unsigned int MOTOR_DIR_DELAY_PRE = 100;
 const unsigned int MOTOR_DIR_DELAY_POST = 150;
-const unsigned int MOTOR_SAFETY_REVERSE = 2000;
+const unsigned int MOTOR_SAFETY_REVERSE_DELAY = 2000;
 const unsigned int MOTOR_SAFETY_REVERSE_ERR_10_DELAY = 1000;
 
 // Calibration delays
@@ -35,7 +38,7 @@ const unsigned int CAL_ERR_10_DELAY = 1000;
 
 const byte TIMEOUT_FACTOR = 150;  // Percentage of expected travel time before timeout
 const byte SLOWDOWN_FACTOR = 95;  // Percentage of expected travel time before slowing
-const byte ERR_10_FACTOR = 10;
+const byte ERR_10_FACTOR = 10;    // Percentage of expected travel time before error 10 eligibility
 
 
 /////////////////////////
@@ -72,21 +75,17 @@ typedef enum sensor_group {
 	ENDSTOP_ANY = 11
 };
 
-// Motor general operation states
+// Motor operation states
 typedef enum motor_state {
+	INIT,
 	IDLE,
-	FORWARD_START,
-	FORWARD,
-	FORWARD_NEAR,
-	DELAY_PRE_F_B,
-	DELAY_POST_F_B,
-	BACKWARD_START,
-	BACKWARD,
-	BACKWARD_NEAR,
-	DELAY_PRE_B_F,
-	DELAY_POST_B_F,
-	SAFETY_REVERSE_FAILURE,
-	SAFETY_REVERSE_EARLY,
+	MOVE_START,
+	MOVE,
+	MOVE_END,
+	DELAY_PRE_CHANGE,
+	DELAY_POST_CHANGE,
+	SAFETY_REVERSE_ENDSTOP_FAIL,
+	SAFETY_REVERSE_ENDSTOP_EARLY,
 	FAULTED
 };
 
@@ -131,7 +130,23 @@ void runCalibration();
  * The calibration routine can be exited at any time by pressing the arcade button.
  * Calibration variables are not altered if the routine is aborted.
  *
- * Affects Motor_Direction[], Motor_Timeout[], and Motor_Endstops[]
+ * Affects Timeout_Forward[], Timeout_Backward[], Slowdown_Forward[], Slowdown_Backward[],
+ *         Error_10_Forward[], Error_10_Backward[], and Endstop_Forward[]
+ */
+
+void readSavedCalibrationData();
+/*
+ * Reads calibration data from EEPROM to global variables
+ *
+ * Affects Timeout_Forward[], Timeout_Backward[], Slowdown_Forward[], Slowdown_Backward[],
+ *         Error_10_Forward[], Error_10_Backward[], and Endstop_Forward[]
+ */
+
+void saveCalibrationData();
+/*
+ * Saves calibration data from global variables to EEPROM
+ *
+ * Affects locations 0xTODO to 0xTODO (inclusive) of EEPROM
  */
 
 bool sensorEngaged(sensor_group sensor);
@@ -142,19 +157,29 @@ bool sensorEngaged(sensor_group sensor);
  * OUTPUT: State of being engaged
  */
 
-void readCalibration();
+void changeMotorState(byte motor, motor_state state);
 /*
- * Reads calibration data from EEPROM to global variables
+ * Changes the state of a motor, handling all the tricky bits
  *
- * Affects Motor_Timeout[3] and Motor_Endstops[6]
+ * This includes enabling/disabling outputs, updating Motor_State_Start[],
+ * and changes to direction and speed.
+ *
+ * Error codes are not flagged by this function.
  */
 
-void saveCalibration(int timeouts[6], byte location_endstops[6]);
+void assertCriticalError();
 /*
- * Saves calibration data to EEPROM
- * 
- * INPUT:  Array of motor timeout constants
- *         Array of expected endstop for each motor/direction pair
+ * Flags a critical error and halts all motors
+ *
+ * Affects Motor_State[] and Motor_State_Start[]
+ */
+
+void reverseMotor(byte motor);
+/*
+ * Reverses the direction of a given motor
+ *
+ * Affects Endstop_Front[motor] and Endstop_Back[motor]
+ * INPUT:  Motor (0-indexed)
  */
 
 

@@ -33,7 +33,7 @@ With the exception of the power connector, the EWMC interfaces with all inputs a
 
 The four high-power outputs feature shrouded right-angle headers with latch holders (Molex 70553-0001). While standard non-polarized connectors will fit, it is suggested to use a latched housing (Molex 50-57-9402). 24 AWG (or thicker) wire should be used with these connectors due to current draw.
 
-The seven GPIO connections and speaker share a standard 8x2 right-angle header, where each pin belongs to a vertical pair. The speaker uses the right-most pair. The remaining seven pairs use the lower pin for ground, while the top pin is an unbuffered connection to the ATmega 328P. To utilize all eight pairs, standard non-polarized housings (Molex 50-57-9002) should be used.
+The seven GPIO connections and speaker share a standard 8x2 right-angle header, where each pin belongs to a vertical pair. The speaker uses the right-most pair. The remaining seven pairs use the lower pin for ground and the top pin is an unbuffered connection to the ATmega 328P. To utilize all eight pairs, standard non-polarized housings (Molex 50-57-9002) should be used.
 
 
 POWER SUPPLY AND RATINGS

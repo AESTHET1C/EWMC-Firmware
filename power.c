@@ -23,19 +23,12 @@ void setPowerOutput(byte output, bool enable) {
 	return;
 }
 
-void setPowerOutputPWM(byte motor, byte power) {
-	// TODO
-	// Calculate affected timer configuration register
-	// Set timer register
-	return;
-}
-
-void reverseMotor(byte motor) {
-	if(getMotorDir(motor) == FORWARD) {
-		setMotorDir(motor, BACKWARD);
+void setMotorSpeed(byte motor, motor_speed speed) {
+	if(speed == SLOW) {
+		setPowerOutputPWM(motor, PWM_SPEED_SLOW[motor]);
 	}
 	else {
-		setMotorDir(motor, FORWARD);
+		setPowerOutputPWM(motor, PWM_SPEED_FAST[motor]);
 	}
 	return;
 }
@@ -63,4 +56,11 @@ bool otherMotorsEnabled(byte motor) {
 		}
 	}
 	return false;
+}
+
+void setPowerOutputPWM(byte power_output, uint8_t pwm) {
+	// TODO
+	// Calculate affected timer configuration register
+	// Set timer register
+	return;
 }

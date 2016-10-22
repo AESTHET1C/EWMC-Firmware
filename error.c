@@ -7,11 +7,11 @@ byte Error_Cycle_Blinks = 0;     // Number of blinks in the current cycle (1-ind
 
 void initErrors() {
 	// TODO
-	clearErrorCodes();
+	clearErrors();
 	return;
 }
 
-void handleErrors() {
+void handleErrorCodeDisplay() {
 	int Tick_Elapsed_Time = millis() - Error_Tick_Start;
 
 	if(Tick_Elapsed_Time >= ERROR_TICK_TIME) {
@@ -31,18 +31,18 @@ void handleErrors() {
 	return;
 }
 
-void setErrorCode(byte error, bool active) {
-	if(error == 0) {
+void flagError(byte error) {
+	if((error == 0) || (error > CRITICAL_ERROR)) {
 		return;
 	}
 	else if(error == CRITICAL_ERROR) {
-		clearErrorCodes();
+		clearErrors();
 	}
-	Error_Status[error - 1] = active;
+	Error_Status[error - 1] = true;
 	return;
 }
 
-void clearErrorCodes() {
+void clearErrors() {
 	for(byte i = 0; i < ERROR_CODES; i++) {
 		Error_Status[i] = false;
 	}

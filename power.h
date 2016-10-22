@@ -42,6 +42,11 @@ typedef enum motor_dir {
 	BACKWARD
 };
 
+typedef enum motor_speed {
+	SLOW,
+	FAST
+}
+
 
 /////////////////////////
 // AVAILABLE FUNCTIONS
@@ -55,7 +60,7 @@ void initPowerOutputs();
  * Initialization involves setting status variables, pin configuration, and PWM values.
  * Initial motor directions are also set.
  *
- * Affects Power_Output_Enabled and Motor_Dir
+ * Affects Power_Output_Enabled[] and Motor_Dir[]
  */
 
 void setPowerOutput(byte output, bool enable);
@@ -66,20 +71,13 @@ void setPowerOutput(byte output, bool enable);
  * INPUT:  Output in question (0-indexed)
  */
 
-void setPowerOutputPWM(byte motor, byte power);
+void setMotorSpeed(byte motor, motor_speed speed);
 /*
- * Sets the output power of a given power output
+ * Sets the speed of a given motor
  *
- * INPUT:  Output in question (0-indexed)
- *         New output power
- */
-
-void reverseMotor(byte motor);
-/*
- * Reverses the direction of a given motor
- *
- * Affects Motor_Dir[]
+ * Affects timer registers TODO
  * INPUT:  Motor (0-indexed)
+ *         Motor speed
  */
 
 void setMotorDir(byte motor, motor_dir dir);
@@ -88,7 +86,7 @@ void setMotorDir(byte motor, motor_dir dir);
  *
  * Affects Motor_Dir[]
  * INPUT:  Motor (0-indexed)
- *         New direction
+ *         Motor direction
  */
 
 motor_dir getMotorDir(byte motor);
@@ -113,7 +111,21 @@ bool otherMotorsEnabled(byte motor);
  * Used to determine critical errors
  *
  * INPUT:  Current [known stationary] motor
- * OUTPUT: Is any motor enabled?
+ * OUTPUT: Is any other motor enabled?
+ */
+
+
+/////////////////////////
+// INTERNAL FUNCTIONS
+/////////////////////////
+
+void setPowerOutputPWM(byte power_output, uint8_t pwm);
+/*
+ * Sets the output PWM of a given power output
+ *
+ * Affects timer registers TODO
+ * INPUT:  Output in question (0-indexed)
+ *         New output PWM value
  */
 
 
