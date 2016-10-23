@@ -23,20 +23,19 @@
 // Endstop delays larger than MOTOR_DIR_DELAY_X will be shortened
 const unsigned int DEBOUNCE_DELAY[7] = {100, 50, 50, 50, 50, 50, 50};
 
-// Motor stage delays
-const unsigned int MOTOR_DIR_DELAY_PRE = 100;
-const unsigned int MOTOR_DIR_DELAY_POST = 150;
-const unsigned int MOTOR_SAFETY_REVERSE_DELAY = 2000;
-const unsigned int MOTOR_SAFETY_REVERSE_ERR_10_DELAY = 1000;
-
-// Calibration delays
+// Motor state delays
+const unsigned int MOTOR_DIR_PRE_CHANGE_DELAY = 250;
+const unsigned int MOTOR_DIR_POST_CHANGE_DELAY = 250;
+const unsigned int MOTOR_IDLE_DELAY[3] = {3000, 1000, 2000};
 const unsigned int CAL_STAGE_DELAY = 3000;
-const unsigned int CAL_TIMEOUT = 10000;
-const unsigned int CAL_ERR_10_DELAY = 1000;
 
-const byte TIMEOUT_FACTOR = 150;  // Percentage of expected travel time before timeout
+// Calibration default values
+const unsigned int CAL_TIMEOUT[3] = {10000, 10000, 10000};
+const unsigned int CAL_NEAR[3] = {1000, 1000, 1000};
+
+const byte NEAR_FACTOR = 10;      // Percentage of expected travel time before no longer near endstop
 const byte SLOWDOWN_FACTOR = 95;  // Percentage of expected travel time before slowing
-const byte ERR_10_FACTOR = 10;    // Percentage of expected travel time before error 10 eligibility
+const byte TIMEOUT_FACTOR = 110;  // Percentage of expected travel time before timeout
 
 
 /////////////////////////
@@ -140,9 +139,13 @@ void readSavedCalibrationData();
  *         Error_10_Forward[], Error_10_Backward[], and Endstop_Forward[]
  */
 
-void saveCalibrationData();
+void saveCalibrationData(unsigned int ref_time_forward[3], unsigned int ref_time_backward[3]);
 /*
- * Saves calibration data from global variables to EEPROM
+ * Saves calibration data to EEPROM
+ *
+ * Both global variables and reference times are used to calculate stored data.
+ * Reference travel times for each motor are stared, in addition to calibration constants.
+ * Endstop_Forward[] is also saved.
  *
  * Affects locations 0xTODO to 0xTODO (inclusive) of EEPROM
  */

@@ -6,8 +6,8 @@ The Eli Whitney Mine Controller (EWMC) is an ATmega 328P-powered board that atta
 -Raise or lower the mine shaft elevator when the arcade button is pressed
 -Continue raising and lowering the mine shaft elevator while the arcade button is being pressed
 -Move the mine cart back and forth while the arcade button is being pressed
--Raise and lower the clamshell bucket when the arcade button is pressed
--Power the electromagnet within the clamshell bucket to pick up objects
+-Raise and lower the clamshell loader's bucket when the arcade button is pressed
+-Power the electromagnet within the clamshell loader's bucket to pick up objects
 -Play multiple short sound effects at random intervals while the arcade button is being pressed
 
 The Firmware also utilizes dual endstop sensors per motor along with an optional startup calibration routine to prevent erroneous motor control. In the event that a malfunction does happen, the Firmware will disable the operation of the affected motor and display an error code on the EWMC board's LED.
@@ -29,9 +29,9 @@ Calibration is needed whenever endstops or motors have been unplugged since the 
 
 Stage 1 - Manual Endstop Engagement:
 	1: Disengage all endstops.
-	2: Manually engage an endstop (A or B) for the mine shaft. A beep will play upon successful engagement.
-	3: Manually engage the opposing endstop for the mine shaft. Two beeps will play upon successful engagement.
-	4: Repeat these steps for the mine cart, then the clamshell.
+	2: Manually engage an endstop (A or B) for the elevator. A beep will play upon successful engagement.
+	3: Manually engage the opposing endstop for the elevator. Two beeps will play upon successful engagement.
+	4: Repeat these steps for the mine cart, then the loader.
 	5: Remove hands from all motor paths
 
 	This stage is used to verify endstops are working and plugged into the correct locations. If an endstop does not beep upon engagement, verify the speaker and endstop are working and plugged into the correct locations. Once this stage is completed, calibration continues to stage 2 after a 3-second delay.
@@ -48,19 +48,19 @@ WIRING CONNECTIONS
 
 The four high-power connections are located on the bottom right of the EWMC board. From left to right, they are:
 
--Mine shaft motor
+-Elevator motor
 -Mine cart motor
--Clamshell motor
--Clamshell electromagnet
+-Loader motor
+-Loader electromagnet
 
 The eight low-power connections are located on the bottom left of the EWMC board. From left to right, they are:
 
--Mine shaft endstop A
--Mine shaft endstop B
+-Elevator endstop A
+-Elevator endstop B
 -Mine cart endstop A
 -Mine cart endstop B
--Clamshell endstop A
--Clamshell endstop B
+-Loader endstop A
+-Loader endstop B
 -Arcade button
 -Speaker
 
@@ -97,9 +97,9 @@ Errors 1-6:
 Errors 7-9:
 	Overview:
 		-An endstop engaged early
-		-Error 7 corresponds to the mine shaft
+		-Error 7 corresponds to the elevator
 		-Error 8 corresponds to the mine cart
-		-Error 9 corresponds to the clamshell
+		-Error 9 corresponds to the loader
 	Trigger Conditions:
 		-The corresponding motor takes less time than expected to engage the endstop it was traveling toward
 		-An endstop is engaged upon power up, before calibration begins
@@ -115,14 +115,14 @@ Errors 7-9:
 
 Error 10 (Critical error):
 	Overview:
-		-An endstop was engaged erroneously
+		-At least one endstop was engaged erroneously
 		-An unrecoverable error was triggered
 	Trigger Conditions:
 		-Any pair of endstops engages simultaneously
-		-Any endstop engages while the corresponding motor is traveling in the wrong direction
-		-Any endstop engages while the corresponding motor is stationary but any other motor is moving
+		-Any endstop engages while the corresponding motor is stationary but any other motor is active
+		-Any endstop engages while the corresponding motor is traveling in the opposite direction
+		-Any endstop fails to disengage in a reasonable time while the corresponding motor is traveling in the opposite direction
 		-Either endstop engages while the corresponding motor is reversing during errors 1-6
-		-The endstop in question fails to disengage while the motor reverses during errors 7-9
 		-The arcade button was pressed during stage 2 of calibration
 	Potential Causes:
 		-The endstops are plugged in incorrectly

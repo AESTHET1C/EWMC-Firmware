@@ -69,6 +69,7 @@ void setPowerOutput(byte output, bool enable);
  *
  * Affects Power_Output_Enabled[]
  * INPUT:  Output in question (0-indexed)
+ *         State of being enabled
  */
 
 void setMotorSpeed(byte motor, motor_speed speed);
@@ -110,7 +111,7 @@ bool otherMotorsEnabled(byte motor);
  * Determines if any other motors are currently moving
  * Used to determine critical errors
  *
- * INPUT:  Current [known stationary] motor
+ * INPUT:  Current [known stationary] motor (0-indexed)
  * OUTPUT: Is any other motor enabled?
  */
 

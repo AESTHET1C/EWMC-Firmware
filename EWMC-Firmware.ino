@@ -4,12 +4,12 @@
 #include "audio.h"
 
 // Motor + Endstop calibration variables
-unsigned int Timeout_Forward[3];    // Emergency timeout for each motor
-unsigned int Timeout_Backward[3];
+unsigned int Near_Forward[3];       // Time constant for each motor by which endstop should disengage
+unsigned int Near_Backward[3];
 unsigned int Slowdown_Forward[3];   // Time delay for each motor before slowing
 unsigned int Slowdown_Backward[3];
-unsigned int Error_10_Forward[3];   // Timeout for each motor before error 10 eligibility
-unsigned int Error_10_Backward[3];
+unsigned int Timeout_Forward[3];    // Emergency timeout for each motor
+unsigned int Timeout_Backward[3];
 sensor_group Endstop_Forward[3];    // The expected endstop for each motor, assuming it travels forward
 
 // Motor state variables
@@ -123,6 +123,8 @@ void runCalibration() {
 	}
 
 	// Stage 2, Step 1: Slowly cycle each motor to endstops
+	unsigned int Timeout_Forward_Buffer[3];
+	unsigned int Timeout_Backward_Buffer[3];
 	sensor_group Endstop_Forward_Buffer[3] = {ENDSTOP_1, ENDSTOP_3, ENDSTOP_5};
 
 	setPowerOutput(0, true);
@@ -142,10 +144,10 @@ void runCalibration() {
 					sensor_group Endstop_X = ((Motor * 2) + ENDSTOP_1);
 					sensor_group Endstop_Y = (Endstop_X + 1);
 
-					if((millis() - Motor_State_Start[Motor]) >= CAL_TIMEOUT) {
+					if((millis() - Motor_State_Start[Motor]) >= CAL_TIMEOUT[Motor]) {
+						changeMotorState(Motor, SAFETY_REVERSE_ENDSTOP_FAIL);
 						flagError(Endstop_X);
 						flagError(Endstop_Y);
-						changeMotorState(Motor, SAFETY_REVERSE_ENDSTOP_FAIL);
 					}
 					else if(sensorEngaged(Endstop_X)) {
 						changeMotorState(Motor, DELAY_PRE_CHANGE);
@@ -171,7 +173,7 @@ void runCalibration() {
 							changeMotorState(Motor, FAULTED);
 							flagError(Endstop_Front[Motor]);
 						}
-						else if(Elapsed_Time >= MOTOR_DIR_DELAY_PRE) {
+						else if(Elapsed_Time >= MOTOR_DIR_PRE_CHANGE_DELAY) {
 							changeMotorState(Motor, DELAY_POST_CHANGE);
 						}
 					}
@@ -184,7 +186,7 @@ void runCalibration() {
 						changeMotorState(Motor, FAULTED);
 						flagError(Endstop_Back[Motor]);
 					}
-					else if((millis() - Motor_State_Start[Motor]) >= MOTOR_DIR_DELAY_POST) {
+					else if((millis() - Motor_State_Start[Motor]) >= MOTOR_DIR_POST_CHANGE_DELAY) {
 						if(getMotorDir(Motor) == BACKWARD) {
 							changeMotorState(Motor, MOVE_START);
 						}
@@ -200,7 +202,7 @@ void runCalibration() {
 					else if(!sensorEngaged(Endstop_Back[Motor])) {
 						changeMotorState(Motor, MOVE);
 					}
-					else if((millis() - Motor_State_Start[Motor]) >= CAL_ERR_10_DELAY) {
+					else if((millis() - Motor_State_Start[Motor]) >= CAL_NEAR[Motor]) {
 						assertCriticalError();
 					}
 					break;
@@ -210,20 +212,14 @@ void runCalibration() {
 					if((sensorEngaged(Endstop_Back[Motor])) && (Elapsed_Time >= DEBOUNCE_DELAY[Endstop_Back[Motor]])) {
 						assertCriticalError();
 					}
-					else if(Elapsed_Time >= CAL_TIMEOUT) {
+					else if(Elapsed_Time >= CAL_TIMEOUT[Motor]) {
 						changeMotorState(Motor, SAFETY_REVERSE_ENDSTOP_FAIL);
 						flagError(Endstop_Front[Motor]);
 					}
 					else if(sensorEngaged(Endstop_Front[Motor])) {
 						changeMotorState(Motor, DELAY_PRE_CHANGE);
-					}
-					break;
-				case SAFETY_REVERSE_FAILURE:
-					if(sensorEngaged(Motor + ENDSTOP_MOTOR_1)) {
-						assertCriticalError();
-					}
-					else if((millis() - Motor_State_Start[Motor]) >= MOTOR_SAFETY_REVERSE_DELAY) {
-						changeMotorState(Motor, FAULTED);
+						Timeout_Forward_Buffer[Motor] = Elapsed_Time;
+						Timeout_Backward_Buffer[Motor] = Elapsed_Time;
 					}
 					break;
 				case IDLE:
@@ -233,6 +229,14 @@ void runCalibration() {
 					else if(!sensorEngaged(Endstop_Back[Motor])) {
 						flagError(Endstop_Back[Motor]);
 						Cal_Motor_State[Motor] = FAULTED;
+					}
+					break;
+				case SAFETY_REVERSE_ENDSTOP_FAIL:
+					if(sensorEngaged(Motor + ENDSTOP_MOTOR_1)) {
+						assertCriticalError();
+					}
+					else if((millis() - Motor_State_Start[Motor]) >= CAL_NEAR[Motor]) {
+						changeMotorState(Motor, FAULTED);
 					}
 					break;
 			}
@@ -257,19 +261,43 @@ void runCalibration() {
 	while(Motor_State != {IDLE, IDLE, IDLE}) {
 		for(byte Motor = 0; Motor < 3; Motor++) {
 			switch(Motor_State[Motor]) {
-				// TODO
+				default:
+				case FAULTED:
+					setPowerOutput(Motor, false);
+					break;
+				case INIT:
+					// TODO
+					break;
+				case DELAY_PRE_CHANGE:
+					// TODO
+					break;
+				case DELAY_POST_CHANGE:
+					// TODO
+					break;
+				case MOVE_START:
+					// TODO
+					break;
+				case MOVE:
+					// TODO
+					break;
+				case IDLE:
+					// TODO
+					break;
+				case SAFETY_REVERSE_ENDSTOP_FAIL:
+					// TODO
+					break;
 			}
 		}
 	}
 
 	// Calibration complete, update calibration variables
 	for(byte Motor = 0; Motor < 3; Motor++) {
-		Timeout_Forward[Motor] = ((Reference_Time_Forward[Motor] * TIMEOUT_FACTOR) / 100);
-		Timeout_Backward[Motor] = ((Reference_Time_Backward[Motor] * TIMEOUT_FACTOR) / 100);
+		Near_Forward[Motor] = ((Reference_Time_Forward[Motor] * NEAR_FACTOR) / 100);
+		Near_Backward[Motor] = ((Reference_Time_Backward[Motor] * NEAR_FACTOR) / 100);
 		Slowdown_Forward[Motor] = ((Reference_Time_Forward[Motor] * SLOWDOWN_FACTOR) / 100);
 		Slowdown_Backward[Motor] = ((Reference_Time_Backward[Motor] * SLOWDOWN_FACTOR) / 100);
-		Error_10_Forward[Motor] = ((Reference_Time_Forward[Motor] * ERR_10_FACTOR) / 100);
-		Error_10_Backward[Motor] = ((Reference_Time_Backward[Motor] * ERR_10_FACTOR) / 100);
+		Timeout_Forward[Motor] = ((Reference_Time_Forward[Motor] * TIMEOUT_FACTOR) / 100);
+		Timeout_Backward[Motor] = ((Reference_Time_Backward[Motor] * TIMEOUT_FACTOR) / 100);
 		Endstop_Forward[Motor] = Endstop_Forward_Buffer[Motor];
 	}
 	saveCalibrationData();
