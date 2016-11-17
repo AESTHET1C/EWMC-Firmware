@@ -40,4 +40,4 @@ POWER SUPPLY AND RATINGS
 
 While intended to be run from a 12 volt supply, the EWMC is capable of being run from any voltage between approximately 5.5 and 16 volts. The four high-power outputs use this voltage, while the seven GPIO connections are 5 volt logic via an internal regulator.
 
-The four high-power outputs are rated for 3 amps of continuous current. Peak current is not rated. The seven GPIO outputs are open-collector, with an optional pull-up resistor between 20 and 50 kOhms. Their rated sink current is 40 milliamps per pin.
+The four high-power outputs are rated for 3 amps of continuous current. Peak current is not rated. The seven GPIO outputs are rated for a continuous 40 milliamps per pin. Total current sink on these pins must not exceed 200 milliamps, and the internal regulator can supply up to 150 milliamps.

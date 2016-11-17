@@ -43,8 +43,8 @@ void flagError(byte error) {
 }
 
 void clearErrors() {
-	for(byte i = 0; i < ERROR_CODES; i++) {
-		Error_Status[i] = false;
+	for(byte Error = 0; Error < ERROR_CODES; Error++) {
+		Error_Status[Error] = false;
 	}
 	return;
 }
@@ -52,12 +52,12 @@ void clearErrors() {
 byte getBlinksNext(blinks_prev) {
 	// TODO
 	// Test this
-	for(byte i = blinks_prev++; i != blinks_prev; i++) {
-		if(i > ERROR_CODES) {
-			i = 1;
+	for(byte Blinks_Test = blinks_prev++; Blinks_Test != blinks_prev; Blinks_Test++) {
+		if(Blinks_Test > ERROR_CODES) {
+			Blinks_Test = 1;
 		}
-		if(Error_Status[i - 1]) {
-			return i;
+		if(Error_Status[Blinks_Test - 1]) {
+			return Blinks_Test;
 		}
 	}
 	if((blinks_prev != 0) && Error_Status[blinks_prev - 1]) {

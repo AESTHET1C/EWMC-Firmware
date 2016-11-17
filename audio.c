@@ -58,9 +58,9 @@ void configAudio(uint16_t configuration) {
 }
 
 void sendByte(uint8_t transmission) {
-	for(byte i = 0; i < 8; i++) {
+	for(byte Bit = 0; Bit < 8; Bit++) {
 		DigitalWrite(SPI_SCLK_PIN, LOW);
-		DigitalWrite(SPI_MOSI_PIN, ((transmission >> i) && 0x01));
+		DigitalWrite(SPI_MOSI_PIN, ((transmission >> Bit) && 0x01));
 		DigitalWrite(SPI_SCLK_PIN, HIGH);
 	}
 	return;

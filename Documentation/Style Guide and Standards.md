@@ -186,6 +186,7 @@ These data types should not be used:
 Variables should always specify a type upon declaration.
 	+ Variables should be initialized on declaration only if a default value is logical.
 	  For example, if the variable is assigned several lines down by a function that checks for validity and there is no possible branch operation or attempted use of the variable before this assignment, the initial declaration does not need to be initialized.
+	+ Global variables are an exception to this. They should instead be initialized within an initialization routine.
 	+ Type should not be specified on subsequent assignments.
 + The `typedef` keyword should be used when defining enumerations.
 
