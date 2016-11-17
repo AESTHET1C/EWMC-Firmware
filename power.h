@@ -20,32 +20,32 @@
 /////////////////////////
 
 // PWM presets
-const uint8_t PWM_SPEED_SLOW[3] = [TODO];
-const uint8_t PWM_SPEED_FAST[3] = [TODO];
-const uint8_t PWM_MAGNET = [TODO];
+const uint8_t PWM_SPEED_SLOW[3] = [200, 200, 200];
+const uint8_t PWM_SPEED_FAST[3] = [255, 255, 255];
+const uint8_t PWM_MAGNET = 255;
 
 
 /////////////////////////
 // PIN DEFINITIONS
 /////////////////////////
 
-const byte MOTOR_DIR_PIN[3] = {4, 5, 6};
 const byte POWER_PWM_PIN[4] = {9, 10, 11, 3};
+const byte MOTOR_DIR_PIN[3] = {4, 5, 6};
 
 
 /////////////////////////
 // ENUMERATIONS
 /////////////////////////
 
-typedef enum motor_dir {
-	FORWARD,
-	BACKWARD
-};
-
 typedef enum motor_speed {
 	SLOW,
 	FAST
 }
+
+typedef enum motor_dir {
+	FORWARD,
+	BACKWARD
+};
 
 
 /////////////////////////
@@ -60,7 +60,7 @@ void initPowerOutputs();
  * Initialization involves setting status variables, pin configuration, and PWM values.
  * Initial motor directions are also set.
  *
- * Affects Power_Output_Enabled[] and Motor_Dir[]
+ * Affects Power_Output_PWM[], Power_Output_Enabled[], and Motor_Dir[]
  */
 
 void setPowerOutput(byte output, bool enable);
@@ -76,7 +76,7 @@ void setMotorSpeed(byte motor, motor_speed speed);
 /*
  * Sets the speed of a given motor
  *
- * Affects timer registers TODO
+ * Affects Power_Output_PWM[]
  * INPUT:  Motor (0-indexed)
  *         Motor speed
  */
@@ -124,7 +124,7 @@ void setPowerOutputPWM(byte power_output, uint8_t pwm);
 /*
  * Sets the output PWM of a given power output
  *
- * Affects timer registers TODO
+ * Affects timer registers ORCnx
  * INPUT:  Output in question (0-indexed)
  *         New output PWM value
  */
