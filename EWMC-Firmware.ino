@@ -163,26 +163,18 @@ void runCalibration() {
 					}
 					break;
 				case DELAY_PRE_CHANGE:
-					if((sensorEngaged(Endstop_Back[Motor])) && otherMotorsEnabled(Motor)) {
-						assertCriticalError();
-					}
-					else {
-						unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
+					unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
 
-						if((!sensorEngaged(Endstop_Front[Motor])) && (Elapsed_Time >= DEBOUNCE_DELAY[Endstop_Front[Motor]])) {
-							changeMotorState(Motor, FAULTED);
-							flagError(Endstop_Front[Motor]);
-						}
-						else if(Elapsed_Time >= MOTOR_DIR_PRE_CHANGE_DELAY) {
-							changeMotorState(Motor, DELAY_POST_CHANGE);
-						}
+					if((!sensorEngaged(Endstop_Front[Motor])) && (Elapsed_Time >= DEBOUNCE_DELAY[Endstop_Front[Motor]])) {
+						changeMotorState(Motor, FAULTED);
+						flagError(Endstop_Front[Motor]);
+					}
+					else if(Elapsed_Time >= MOTOR_DIR_PRE_CHANGE_DELAY) {
+						changeMotorState(Motor, DELAY_POST_CHANGE);
 					}
 					break;
 				case DELAY_POST_CHANGE:
-					if((sensorEngaged(Endstop_Front[Motor])) && otherMotorsEnabled(Motor)) {
-						assertCriticalError();
-					}
-					else if(!sensorEngaged(Endstop_Back[Motor])) {
+					if(!sensorEngaged(Endstop_Back[Motor])) {
 						changeMotorState(Motor, FAULTED);
 						flagError(Endstop_Back[Motor]);
 					}
@@ -220,10 +212,7 @@ void runCalibration() {
 					}
 					break;
 				case IDLE:
-					if((sensorEngaged(Endstop_Front[Motor])) && otherMotorsEnabled(Motor)) {
-						assertCriticalError();
-					}
-					else if(!sensorEngaged(Endstop_Back[Motor])) {
+					if(!sensorEngaged(Endstop_Back[Motor])) {
 						flagError(Endstop_Back[Motor]);
 						Cal_Motor_State[Motor] = FAULTED;
 					}
@@ -295,26 +284,18 @@ void runCalibration() {
 					}
 					break;
 				case DELAY_PRE_CHANGE:
-					if((sensorEngaged(Endstop_Back[Motor])) && otherMotorsEnabled(Motor)) {
-						assertCriticalError();
-					}
-					else {
-						unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
+					unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
 
-						if((!sensorEngaged(Endstop_Front[Motor])) && (Elapsed_Time >= DEBOUNCE_DELAY[Endstop_Front[Motor]])) {
-							changeMotorState(Motor, FAULTED);
-							flagError(Endstop_Front[Motor]);
-						}
-						else if(Elapsed_Time >= MOTOR_DIR_PRE_CHANGE_DELAY) {
-							changeMotorState(Motor, DELAY_POST_CHANGE);
-						}
+					if((!sensorEngaged(Endstop_Front[Motor])) && (Elapsed_Time >= DEBOUNCE_DELAY[Endstop_Front[Motor]])) {
+						changeMotorState(Motor, FAULTED);
+						flagError(Endstop_Front[Motor]);
+					}
+					else if(Elapsed_Time >= MOTOR_DIR_PRE_CHANGE_DELAY) {
+						changeMotorState(Motor, DELAY_POST_CHANGE);
 					}
 					break;
 				case DELAY_POST_CHANGE:
-					if((sensorEngaged(Endstop_Front[Motor])) && otherMotorsEnabled(Motor)) {
-						assertCriticalError();
-					}
-					else if(!sensorEngaged(Endstop_Back[Motor])) {
+					if(!sensorEngaged(Endstop_Back[Motor])) {
 						changeMotorState(Motor, FAULTED);
 						flagError(Endstop_Back[Motor]);
 					}
@@ -328,10 +309,7 @@ void runCalibration() {
 					}
 					break;
 				case IDLE:
-					if((sensorEngaged(Endstop_Front[Motor])) && otherMotorsEnabled(Motor)) {
-						assertCriticalError();
-					}
-					else if(!sensorEngaged(Endstop_Back[Motor])) {
+					if(!sensorEngaged(Endstop_Back[Motor])) {
 						flagError(Endstop_Back[Motor]);
 						Cal_Motor_State[Motor] = FAULTED;
 					}
@@ -345,7 +323,7 @@ void runCalibration() {
 					}
 					break;
 			}
-			if(sensorEngaged(Endstop_Forward[Motor]) && sensorEngaged(Endstop_Backward[Motor])) {
+			if(sensorEngaged(Endstop_Forward[Motor]) && sensorEngaged(Endstop_Backward[Motor]) && (powerOutputEnabled(Motor) || otherMotorsEnabled(Motor))) {
 				assertCriticalError();
 			}
 		}
