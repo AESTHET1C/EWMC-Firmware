@@ -54,12 +54,6 @@ typedef enum audio_clip {
 	AUDIO_COUGH_2 = 4
 };
 
-// Audio playback states
-typedef enum audio_state {
-	READY,
-	PLAYING
-};
-
 
 /////////////////////////
 // ISD1700 CONSTANTS

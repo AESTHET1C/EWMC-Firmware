@@ -1,6 +1,6 @@
 unsigned long Audio_Start;
 unsigned int Audio_Duration;
-audio_state Audio_State = READY;
+bool Audio_Playing = false;
 
 void initAudio() {
 	// Prepare SPI outputs
@@ -50,12 +50,12 @@ void beep() {
 }
 
 bool audioPlaying() {
-	if(Audio_State == AUDIO_STATE_PLAYING) {
+	if(Audio_Playing) {
 		if((millis() - Audio_Start) >= Audio_Duration) {
-			Audio_State = AUDIO_STATE_READY
+			Audio_Playing = false;
 		}
 	}
-	return(Audio_State == AUDIO_STATE_PLAYING);
+	return Audio_Playing;
 }
 
 void configAudio(uint16_t configuration) {

@@ -140,4 +140,4 @@ REPROGRAMMING SOUND EFFECTS
 
 The EWMC board uses a Nuvoton ISD1740 chip to handle driving the speaker and storing sounds. To reprogram the chip, see the ISD1700 Design Guide. The sampling frequency is selected by a resistor of nominal value 68 kOhms.
 
-The Firmware uses [TODO] sound effects, played at random intervals. These effects are stored at rows [TODO, TODO, ...] within the ISD1740. Each effect uses [TODO] rows of memory.
+The Firmware uses 4 main sound effects, played at random intervals. These effects are stored at locations 0x011-0x027, 0x028-0x03E, 0x03F-0x046, and 0x47-0x04F within the ISD1740. An additional "beep" sound effect, used during calibration, is located in row 0x010.
