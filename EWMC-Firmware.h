@@ -30,6 +30,11 @@ const unsigned int MOTOR_DIR_POST_CHANGE_DELAY = 250;
 const unsigned int MOTOR_IDLE_DELAY[3] = {3000, 1000, 1000};
 const unsigned int CAL_STAGE_DELAY = 3000;
 
+// Audio playback delays
+const unsigned int AUDIO_MIN_DELAY = 3000;
+const unsigned int AUDIO_MAX_DELAY = 10000;
+const unsigned int AUDIO_MIN_BUTTON_DELAY = 5000;
+
 // Calibration default values
 const unsigned int CAL_TIMEOUT[3] = {15000, 15000, 15000};
 const unsigned int CAL_NEAR[3] = {1000, 1000, 1000};
@@ -86,6 +91,13 @@ typedef enum motor_state {
 	SAFETY_REVERSE_ENDSTOP_EARLY,
 	FAULTED
 };
+
+// Audio operation states
+typedef enum audio_state {
+	IDLE,
+	DELAY,
+	PLAY
+}
 
 
 /////////////////////////

@@ -29,6 +29,8 @@ void initISD() {
 }
 
 void playAudio(audio_clip sound) {
+
+	// Send play command
 	DigitalWrite(SPI_SS_PIN, LOW);
 	sendByte(ISD_SET_PLAY);
 	sendByte(0x00);
@@ -38,6 +40,12 @@ void playAudio(audio_clip sound) {
 	sendByte(getByte(ISD_AUDIO_STOP_PTR[sound], 1));
 	sendByte(0x00);
 	DigitalWrite(SPI_SS_PIN, HIGH);
+
+	// Update status variables
+	Audio_Start = millis();
+	Audio_Duration = AUDIO_DURATION[sound];
+	Audio_Playing = true;
+
 	return;
 }
 

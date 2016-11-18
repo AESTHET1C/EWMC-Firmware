@@ -18,6 +18,12 @@ unsigned long Motor_State_Start[3] = {0, 0, 0};
 sensor_group Endstop_Front[3];
 sensor_group Endstop_Back{3];
 
+// Audio state variables
+audio_state Audio_State = IDLE;
+audio_clip Audio_Last_Clip = AUDIO_BEEP;
+unsigned long Audio_Delay_Start = 0;
+unsigned int Audio_Delay_Length = AUDIO_MIN_BUTTON_DELAY;
+
 void setup() {
 	readSavedCalibrationData();
 	initInputs();
@@ -47,6 +53,39 @@ void setup() {
 
 void loop() {
 	// TODO
+
+	switch(Audio_State) {
+		case IDLE:
+			if(sensorEngaged(BUTTON)) {
+				Audio_Delay_Length = random(AUDIO_MIN_BUTTON_DELAY, AUDIO_MAX_DELAY);
+				Audio_State = DELAY;
+			}
+			break;
+		case DELAY:
+			if((Elapsed_Time) > Audio_Delay_Length) {
+				if(sensorEngaged(BUTTON)) {
+					audio_clip Next_Clip = Audio_Last_Clip;
+					while(Next_Clip != Audio_Last_Clip) {
+						Next_Clip = random(AUDIO_EXPLOSION, AUDIO_COUGH_2);
+					}
+					playAudio(Next_Clip);
+					Audio_Last_Clip = Next_Clip;
+
+					Audio_Delay_Length = random(AUDIO_MIN_DELAY, AUDIO_MAX_DELAY);
+					Audio_State = PLAY;
+				}
+				else {
+					Audio_State = IDLE;
+				}
+			}
+			break;
+		case PLAY:
+			if(!audioPlaying()) {
+				Audio_Delay_Start = millis();
+				Audio_State = DELAY;
+			}
+			break;
+	}
 }
 
 void initInputs() {
