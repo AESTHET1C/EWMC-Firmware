@@ -20,9 +20,16 @@
 // CONFIGURATION VARIABLES
 /////////////////////////
 
+const unsigned int BEEP_DELAY = 500;
+
 // Audio clip durations
-const unsigned int AUDIO_BEEP_DURATION = [TODO];
-const unsigned int AUDIO_DURATION = [TODO];       // All clips other than beep
+const unsigned int AUDIO_DURATION = {
+	100,
+	2553,
+	2506,
+	854,
+	1000
+};
 
 
 /////////////////////////
@@ -41,9 +48,10 @@ const byte SPI_SS_PIN = 8;
 // Available audio clips
 typedef enum audio_clip {
 	AUDIO_BEEP = 0,
-	AUDIO_1 = 1,
-	AUDIO_2 = 2,
-	AUDIO_3 = 3
+	AUDIO_EXPLOSION = 1,
+	AUDIO_CANARY = 2,
+	AUDIO_COUGH_1 = 3,
+	AUDIO_COUGH_2 = 4
 };
 
 // Audio playback states
@@ -57,22 +65,31 @@ typedef enum audio_state {
 // ISD1700 CONSTANTS
 /////////////////////////
 
-// ISD1700 commands list
-const byte ISD_STOP = 0x02;
+const byte ISD_POWER_UP_DELAY = 50;
+
+// Commands list
+const byte ISD_PU = 0x01;
 const byte ISD_WR_APC2 = 0x65;
 const byte ISD_SET_PLAY = 0x80;
 
-// ISD1700 configuration data
-const uint16_t ISD_APC_DEFAULT_CONFIG = B0000010010100000;
+// Configuration data
+const uint16_t ISD_APC_DEFAULT_CONFIG = (B00000100 << 8) + B10100000;
 
-// ISD1700 audio pointer array
-// In format [START_1], [END_1], [START_2], etc...
-const uint16_t ISD_AUDIO_PTR[8] = {
-	[TODO], [TODO],
-	[TODO], [TODO],
-	[TODO], [TODO],
-	[TODO], [TODO]
+// Audio pointer arrays
+const uint16_t ISD_AUDIO_START_PTR[5] = {
+	0x010,
+	0x011,
+	0x028,
+	0x03F,
+	0x047
 };
+const uint16_t ISD_AUDIO_STOP_PTR[5] = {
+	0x010,
+	0x027,
+	0x03E,
+	0x046,
+	0x04F
+}
 
 
 /////////////////////////
@@ -90,26 +107,27 @@ void initAudio();
  * Affects Audio_State
  */
 
+void initISD() {
+/*
+ * Initializes the ISD1700 device
+ */
+}
+
 void playAudio(audio_clip sound);
 /*
- * Plays an audio clip
+ * Plays an audio clip without blocking additional code from running
  *
  * Affects Audio_Start, Audio_Duration, and Audio_State
  * INPUT:  Clip to play
  */
 
-void stopAudio();
-/*
- * Stops the currently playing audio clip
- *
- * Affects Audio_State
- */
-
 void beep();
 /*
- * Plays the beep audio clip
+ * Plays the BEEP audio clip
  *
- * Affects Audio_Start, Audio_Duration, and Audio_State
+ * This function waits for the beep to complete, then delays an additional BEEP_DELAY milliseconds.
+ *
+ * Affects Audio_Start and Audio_Duration
  */
 
 bool audioPlaying();
