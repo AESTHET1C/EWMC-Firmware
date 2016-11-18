@@ -32,8 +32,17 @@ void setup() {
 
 	delay(DEBOUNCE_DELAY[BUTTON]);
 	runCalibration();
-	// TODO
-	// Change motor direction if endstops engaged
+
+	bool Any_Motor_Swapped = false;
+	for(byte Motor = 0; Motor < 3; Motor++) {
+		if(sensorEngaged(Endstop_Forward[Motor])) {
+			reverseMotor(Motor);
+			Any_Motor_Swapped = true;
+		}
+	}
+	if(Any_Motor_Swapped) {
+		delay(MOTOR_DIR_POST_CHANGE_DELAY);
+	}
 }
 
 void loop() {
@@ -41,7 +50,13 @@ void loop() {
 }
 
 void initInputs() {
-	// TODO
+	pinMode(ENDSTOP_1_PIN, INPUT_PULLUP);
+	pinMode(ENDSTOP_2_PIN, INPUT_PULLUP);
+	pinMode(ENDSTOP_3_PIN, INPUT_PULLUP);
+	pinMode(ENDSTOP_4_PIN, INPUT_PULLUP);
+	pinMode(ENDSTOP_5_PIN, INPUT_PULLUP);
+	pinMode(ENDSTOP_6_PIN, INPUT_PULLUP);
+	pinMode(BUTTON_PIN, INPUT_PULLUP);
 	return;
 }
 
@@ -331,27 +346,58 @@ void runCalibration() {
 
 	// Calibration complete, update calibration variables
 	for(byte Motor = 0; Motor < 3; Motor++) {
-		Near_Forward[Motor] = ((Reference_Time_Forward[Motor] * NEAR_FACTOR) / 100);
-		Near_Backward[Motor] = ((Reference_Time_Backward[Motor] * NEAR_FACTOR) / 100);
-		Slowdown_Forward[Motor] = ((Reference_Time_Forward[Motor] * SLOWDOWN_FACTOR) / 100);
-		Slowdown_Backward[Motor] = ((Reference_Time_Backward[Motor] * SLOWDOWN_FACTOR) / 100);
-		Timeout_Forward[Motor] = ((Reference_Time_Forward[Motor] * TIMEOUT_FACTOR) / 100);
-		Timeout_Backward[Motor] = ((Reference_Time_Backward[Motor] * TIMEOUT_FACTOR) / 100);
+		Near_Forward[Motor] = ((((unsigned long) Reference_Time_Forward[Motor]) * NEAR_FACTOR) / 100);
+		Near_Backward[Motor] = ((((unsigned long) Reference_Time_Backward[Motor]) * NEAR_FACTOR) / 100);
+		Slowdown_Forward[Motor] = ((((unsigned long) Reference_Time_Forward[Motor]) * SLOWDOWN_FACTOR) / 100);
+		Slowdown_Backward[Motor] = ((((unsigned long) Reference_Time_Backward[Motor]) * SLOWDOWN_FACTOR) / 100);
+		Timeout_Forward[Motor] = ((((unsigned long) Reference_Time_Forward[Motor]) * TIMEOUT_FACTOR) / 100);
+		Timeout_Backward[Motor] = ((((unsigned long) Reference_Time_Backward[Motor]) * TIMEOUT_FACTOR) / 100);
 		Endstop_Forward[Motor] = Endstop_Forward_Buffer[Motor];
 	}
-	saveCalibrationData();
+	saveCalibrationData(Reference_Time_Forward, Reference_Time_Backward);
 	return;
 }
 
 void readSavedCalibrationData() {
-	// TODO
-	// Read calibration variables from EEPROM
+	unsigned int Ref_Time_Forward[3];
+	unsigned int Ref_Time_Backward[3];
+
+	// Read data from EEPROM
+	byte Near_Factor = EEPROM.read(EEPROM_NEAR_FACTOR_PTR);
+	byte Slowdown_Factor = EEPROM.read(EEPROM_SLOWDOWN_FACTOR_PRT);
+	byte Timeout_Factor = EEPROM.read(EEPROM_TIMEOUT_FACTOR_PTR);
+	for(byte Offset = 0; Offset < 3; Offset++) {
+		Ref_Time_Forward[Offset * 2] = EEPROM.read(EEPROM_REF_FORWARD_PTR + (Offset * 2));
+		Ref_Time_Forward[Offset * 2] += (((unsigned int) EEPROM.read(EEPROM_REF_FORWARD_PTR + (Offset * 2) + 1)) << 8);
+		Ref_Time_Backward[Offset * 2] = EEPROM.read(EEPROM_REF_BACKWARD_PTR + (Offset * 2));
+		Ref_Time_Backward[Offset * 2] += (((unsigned int) EEPROM.read(EEPROM_REF_BACKWARD_PTR + (Offset * 2) + 1)) << 8);
+		Endstop_Forward[Offset] = EEPROM.read(EEPROM_ENDSTOP_FORWARD_PTR + Offset);
+	}
+
+	// Update calibration variables
+	for(byte Motor = 0; Motor < 3; Motor++) {
+		Near_Forward[Motor] = ((((unsigned long) Ref_Time_Forward[Motor]) * Near_Factor) / 100);
+		Near_Backward[Motor] = ((((unsigned long) Ref_Time_Backward[Motor]) * Near_Factor) / 100);
+		Slowdown_Forward[Motor] = ((((unsigned long) Ref_Time_Forward[Motor]) * Slowdown_Factor) / 100);
+		Slowdown_Backward[Motor] = ((((unsigned long) Ref_Time_Backward[Motor]) * Slowdown_Factor) / 100);
+		Timeout_Forward[Motor] = ((((unsigned long) Ref_Time_Forward[Motor]) * Timeout_Factor) / 100);
+		Timeout_Backward[Motor] = ((((unsigned long) Ref_Time_Backward[Motor]) * Timeout_Factor) / 100);
+	}
+
 	return;
 }
 
-void saveCalibrationData(timeout_array[6], endstops_array[6]) {
-	// TODO
-	// Save calibration variables to EEPROM
+void saveCalibrationData(unsigned int ref_time_forward[3], unsigned int ref_time_backward[3]) {
+	for(byte Offset = 0; Offset < 3; Offset++) {
+		EEPROM.write((EEPROM_REF_FORWARD_PTR + (Offset * 2)), (ref_time_forward[Offset] & 0xFF));
+		EEPROM.update((EEPROM_REF_FORWARD_PTR + (Offset * 2) + 1), ((ref_time_forward[Offset] >> 8) & 0xFF));
+		EEPROM.write((EEPROM_REF_BACKWARD_PTR + (Offset * 2)), (ref_time_backward[Offset] & 0xFF));
+		EEPROM.update((EEPROM_REF_BACKWARD_PTR + (Offset * 2) + 1), ((ref_time_backward[Offset] >> 8) & 0xFF));
+		EEPROM.update((EEPROM_ENDSTOP_FORWARD_PTR + Offset), Endstop_Forward[Offset]);
+	}
+	EEPROM.update(EEPROM_NEAR_FACTOR_PTR, NEAR_FACTOR);
+	EEPROM.update(EEPROM_SLOWDOWN_FACTOR_PRT, SLOWDOWN_FACTOR);
+	EEPROM.update(EEPROM_TIMEOUT_FACTOR_PTR, TIMEOUT_FACTOR);
 	return;
 }
 

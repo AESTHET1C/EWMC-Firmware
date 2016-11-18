@@ -13,6 +13,7 @@
 #ifndef main_h
 #define main_h
 #include <arduino.h>
+#include <EEPROM.h>
 
 /////////////////////////
 // CONFIGURATION VARIABLES
@@ -26,11 +27,11 @@ const unsigned int DEBOUNCE_DELAY[7] = {100, 50, 50, 50, 50, 50, 50};
 // Motor state delays
 const unsigned int MOTOR_DIR_PRE_CHANGE_DELAY = 250;
 const unsigned int MOTOR_DIR_POST_CHANGE_DELAY = 250;
-const unsigned int MOTOR_IDLE_DELAY[3] = {3000, 1000, 2000};
+const unsigned int MOTOR_IDLE_DELAY[3] = {3000, 1000, 1000};
 const unsigned int CAL_STAGE_DELAY = 3000;
 
 // Calibration default values
-const unsigned int CAL_TIMEOUT[3] = {10000, 10000, 10000};
+const unsigned int CAL_TIMEOUT[3] = {15000, 15000, 15000};
 const unsigned int CAL_NEAR[3] = {1000, 1000, 1000};
 
 const byte NEAR_FACTOR = 10;      // Percentage of expected travel time before no longer near endstop
@@ -88,6 +89,18 @@ typedef enum motor_state {
 
 
 /////////////////////////
+// EEPROM POINTERS
+/////////////////////////
+
+uint16_t EEPROM_REF_FORWARD_PTR = 0x000;
+uint16_t EEPROM_REF_BACKWARD_PTR = 0x006;
+uint16_t EEPROM_ENDSTOP_FORWARD_PTR = 0x00C;
+uint16_t EEPROM_NEAR_FACTOR_PTR = 0x00F;
+uint16_t EEPROM_SLOWDOWN_FACTOR_PTR = 0x010;
+uint16_t EEPROM_TIMEOUT_FACTOR_PTR = 0x011;
+
+
+/////////////////////////
 // INTERNAL FUNCTIONS
 /////////////////////////
 
@@ -135,8 +148,8 @@ void readSavedCalibrationData();
 /*
  * Reads calibration data from EEPROM to global variables
  *
- * Affects Timeout_Forward[], Timeout_Backward[], Slowdown_Forward[], Slowdown_Backward[],
- *         Error_10_Forward[], Error_10_Backward[], and Endstop_Forward[]
+ * Affects Near_Forward[], Near_Backward[], Slowdown_Forward[], Slowdown_Backward[],
+ *         Timeout_Forward[], Timeout_Backward[], and Endstop_Forward[]
  */
 
 void saveCalibrationData(unsigned int ref_time_forward[3], unsigned int ref_time_backward[3]);
@@ -147,7 +160,7 @@ void saveCalibrationData(unsigned int ref_time_forward[3], unsigned int ref_time
  * Reference travel times for each motor are stared, in addition to calibration constants.
  * Endstop_Forward[] is also saved.
  *
- * Affects locations 0xTODO to 0xTODO (inclusive) of EEPROM
+ * Affects locations 0x000 to 0x011 (inclusive) of EEPROM
  */
 
 bool sensorEngaged(sensor_group sensor);
