@@ -25,8 +25,8 @@
 const unsigned int DEBOUNCE_DELAY[7] = {100, 50, 50, 50, 50, 50, 50};
 
 // Motor state delays
-const unsigned int MOTOR_DIR_PRE_CHANGE_DELAY = 250;
-const unsigned int MOTOR_DIR_POST_CHANGE_DELAY = 250;
+const unsigned int RELAY_PRE_CHANGE_DELAY = 250;
+const unsigned int RELAY_POST_CHANGE_DELAY = 250;
 const unsigned int MOTOR_IDLE_DELAY[3] = {3000, 1000, 1000};
 const unsigned int CAL_STAGE_DELAY = 3000;
 
