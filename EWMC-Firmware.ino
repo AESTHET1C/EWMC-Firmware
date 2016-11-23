@@ -321,12 +321,12 @@ void runCalibration() {
 	sensor_group Endstop_Forward_Buffer[3] = {ENDSTOP_1, ENDSTOP_3, ENDSTOP_5};
 
 	Motor_State = {INIT, INIT, INIT};
-	setPowerOutput(0, true);
-	Motor_State_Start[0] = millis();
-	setPowerOutput(1, true);
-	Motor_State_Start[1] = millis();
-	setPowerOutput(2, true);
-	Motor_State_Start[2] = millis();
+	setPowerOutput(ELEVATOR_MOTOR, true);
+	Motor_State_Start[ELEVATOR_MOTOR] = millis();
+	setPowerOutput(CART_MOTOR, true);
+	Motor_State_Start[CART_MOTOR] = millis();
+	setPowerOutput(LOADER_MOTOR, true);
+	Motor_State_Start[LOADER_MOTOR] = millis();
 	while(Motor_State != {IDLE, IDLE, IDLE}) {
 		for(output_group Motor = ELEVATOR_MOTOR; Motor <= LOADER_MOTOR; Motor++) {
 			switch(Motor_State[Motor]) {
@@ -431,12 +431,12 @@ void runCalibration() {
 	unsigned int Reference_Time_Backward[3];
 
 	Motor_State = {MOVE_START, MOVE_START, MOVE_START};
-	setPowerOutput(0, true);
-	Motor_State_Start[0] = millis();
-	setPowerOutput(1, true);
-	Motor_State_Start[1] = millis();
-	setPowerOutput(2, true);
-	Motor_State_Start[2] = millis();
+	setPowerOutput(ELEVATOR_MOTOR, true);
+	Motor_State_Start[ELEVATOR_MOTOR] = millis();
+	setPowerOutput(CART_MOTOR, true);
+	Motor_State_Start[CART_MOTOR] = millis();
+	setPowerOutput(LOADER_MOTOR, true);
+	Motor_State_Start[LOADER_MOTOR] = millis();
 	while(Motor_State != {IDLE, IDLE, IDLE}) {
 		for(output_group Motor = ELEVATOR_MOTOR; Motor <= LOADER_MOTOR; Motor++) {
 			switch(Motor_State[Motor]) {
@@ -649,9 +649,9 @@ void reverseMotor(output_group motor) {
 }
 
 void assertCriticalError() {
-	setPowerOutput(0, false);
-	setPowerOutput(1, false);
-	setPowerOutput(2, false);
+	setPowerOutput(ELEVATOR_MOTOR, false);
+	setPowerOutput(CART_MOTOR, false);
+	setPowerOutput(LOADER_MOTOR, false);
 	Motor_State_Start[] = {millis(), Motor_State_Start[0], Motor_State_Start[0]};
 	Motor_State[] = {FAULTED, FAULTED, FAULTED};
 	flagError(CRITICAL_ERROR);
