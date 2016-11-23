@@ -205,6 +205,9 @@ void changeMotorState(output_group motor, motor_state state);
  * This includes enabling/disabling outputs, updating Motor_State_Start[],
  * and changes to direction and speed.
  *
+ * The loader electromagnet is disabled upon any fault conditions of the loader motor. However,
+ * The loader electromagnet must be enabled outside this function.
+ *
  * Error codes are not flagged by this function.
  *
  * Affects Motor_State[], Motor_State_Start[], Endstop_Front[], Endstop_Back[], and state variables

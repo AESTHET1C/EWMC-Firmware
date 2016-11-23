@@ -58,9 +58,6 @@ void setup() {
 }
 
 void loop() {
-	// TODO
-	// Add electromagnet functionality
-
 	for(output_group Motor = ELEVATOR_MOTOR; Motor <= LOADER_MOTOR; Motor++) {
 		switch(Motor_State[Motor]) {
 			case IDLE:
@@ -70,6 +67,9 @@ void loop() {
 				}
 				else if(sensorEngaged(BUTTON)) {
 					changeMotorState(Motor, MOVE_START);
+					if(Motor == LOADER_MOTOR) {
+						setPowerOutput(LOADER_MAGNET, true);
+					}
 				}
 				break;
 			case MOVE_START:
@@ -103,6 +103,9 @@ void loop() {
 				}
 				else if(sensorEngaged(Endstop_Front[Motor])) {
 					changeMotorState(Motor, DELAY_PRE_CHANGE);
+					if(Motor == LOADER_MOTOR) {
+						setPowerOutput(LOADER_MAGNET, false);
+					}
 				}
 				break;
 			case DELAY_PRE_CHANGE:
@@ -149,6 +152,9 @@ void loop() {
 			default:
 			case FAULTED:
 				setPowerOutput(Motor, false);
+				if(Motor == LOADER_MOTOR) {
+					setPowerOutput(LOADER_MAGNET, false);
+				}
 				break;
 		}
 		if(sensorEngaged(Endstop_Forward[Motor]) && sensorEngaged(Endstop_Backward[Motor]) && anyMotorEnabled()) {
@@ -601,6 +607,9 @@ void changeMotorState(output_group motor, motor_state state) {
 		case FAULTED:
 		case DELAY_PRE_CHANGE:
 			setPowerOutput(motor, false);
+			if(motor == LOADER_MOTOR) {
+				setPowerOutput(LOADER_MAGNET, false);
+			}
 			break;
 		case SAFETY_REVERSE_ENDSTOP_EARLY:
 		case SAFETY_REVERSE_ENDSTOP_FAIL:
