@@ -63,7 +63,7 @@ void initPowerOutputs();
  * Affects Power_Output_PWM[], Power_Output_Enabled[], and Motor_Dir[]
  */
 
-void setPowerOutput(byte output, bool enable);
+void setPowerOutput(output_group output, bool enable);
 /*
  * Enables or disables a power output
  *
@@ -72,7 +72,7 @@ void setPowerOutput(byte output, bool enable);
  *         State of being enabled
  */
 
-void setMotorSpeed(byte motor, motor_speed speed);
+void setMotorSpeed(output_group motor, motor_speed speed);
 /*
  * Sets the speed of a given motor
  *
@@ -81,7 +81,7 @@ void setMotorSpeed(byte motor, motor_speed speed);
  *         Motor speed
  */
 
-void setMotorDir(byte motor, motor_dir dir);
+void setMotorDir(output_group motor, motor_dir dir);
 /*
  * Sets the direction of a given motor
  *
@@ -90,7 +90,7 @@ void setMotorDir(byte motor, motor_dir dir);
  *         Motor direction
  */
 
-motor_dir getMotorDir(byte motor);
+motor_dir getMotorDir(output_group motor);
 /*
  * Gets the current direction of a motor
  *
@@ -98,7 +98,7 @@ motor_dir getMotorDir(byte motor);
  * OUTPUT: Direction of motor
  */
 
-bool powerOutputEnabled(byte output);
+bool powerOutputEnabled(output_group output);
 /*
  * Gets the state of a power output
  *
@@ -119,7 +119,7 @@ bool anyMotorEnabled();
 // INTERNAL FUNCTIONS
 /////////////////////////
 
-void setPowerOutputPWM(byte power_output, uint8_t pwm);
+void setPowerOutputPWM(output_group power_output, uint8_t pwm);
 /*
  * Sets the output PWM of a given power output
  *

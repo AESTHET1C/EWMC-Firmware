@@ -43,7 +43,7 @@ void setup() {
 	runCalibration();
 
 	// Make sure all motors are in correct state
-	for(byte Motor = 0; Motor < 3; Motor++) {
+	for(output_group Motor = ELEVATOR_MOTOR; Motor <= LOADER_MOTOR; Motor++) {
 		if(sensorEngaged(Endstop_Front[Motor])) {
 			changeMotorState(Motor, DELAY_POST_CHANGE);
 		}
@@ -52,13 +52,16 @@ void setup() {
 		}
 		else {
 			changeMotorState(Motor, MOVE_END);
-			setPowerOutput(motor, true);
+			setPowerOutput(Motor, true);
 		}
 	}
 }
 
 void loop() {
-	for(byte Motor = 0; Motor < 3; Motor++) {
+	// TODO
+	// Add electromagnet functionality
+
+	for(output_group Motor = ELEVATOR_MOTOR; Motor <= LOADER_MOTOR; Motor++) {
 		switch(Motor_State[Motor]) {
 			case IDLE:
 				if(!sensorEngaged(Endstop_Back[Motor])) {
@@ -228,7 +231,7 @@ void runCalibration() {
 	}
 
 	// Stage 1, Steps 2-4: Manually engage all endstops group by group
-	for(byte Motor = 0; Motor < 3; Motor++) {
+	for(output_group Motor = ELEVATOR_MOTOR; Motor <= LOADER_MOTOR; Motor++) {
 		sensor_group Sensor_Group_Init = Motor + 7;
 		sensor_group Sensor_Group_Next = Sensor_Init + 1;
 		sensor_group Sensor_A = ((Motor * 2) + 1);
@@ -319,7 +322,7 @@ void runCalibration() {
 	setPowerOutput(2, true);
 	Motor_State_Start[2] = millis();
 	while(Motor_State != {IDLE, IDLE, IDLE}) {
-		for(byte Motor = 0; Motor < 3; Motor++) {
+		for(output_group Motor = ELEVATOR_MOTOR; Motor <= LOADER_MOTOR; Motor++) {
 			switch(Motor_State[Motor]) {
 				default:
 				case FAULTED:
@@ -429,7 +432,7 @@ void runCalibration() {
 	setPowerOutput(2, true);
 	Motor_State_Start[2] = millis();
 	while(Motor_State != {IDLE, IDLE, IDLE}) {
-		for(byte Motor = 0; Motor < 3; Motor++) {
+		for(output_group Motor = ELEVATOR_MOTOR; Motor <= LOADER_MOTOR; Motor++) {
 			switch(Motor_State[Motor]) {
 				default:
 				case FAULTED:
@@ -505,7 +508,7 @@ void runCalibration() {
 	}
 
 	// Calibration complete, update calibration variables
-	for(byte Motor = 0; Motor < 3; Motor++) {
+	for(output_group Motor = ELEVATOR_MOTOR; Motor <= LOADER_MOTOR; Motor++) {
 		Near_Forward[Motor] = ((((unsigned long) Reference_Time_Forward[Motor]) * NEAR_FACTOR) / 100);
 		Near_Backward[Motor] = ((((unsigned long) Reference_Time_Backward[Motor]) * NEAR_FACTOR) / 100);
 		Slowdown_Forward[Motor] = ((((unsigned long) Reference_Time_Forward[Motor]) * SLOWDOWN_FACTOR) / 100);
@@ -535,7 +538,7 @@ void readSavedCalibrationData() {
 	}
 
 	// Update calibration variables
-	for(byte Motor = 0; Motor < 3; Motor++) {
+	for(output_group Motor = ELEVATOR_MOTOR; Motor <= LOADER_MOTOR; Motor++) {
 		Near_Forward[Motor] = ((((unsigned long) Ref_Time_Forward[Motor]) * Near_Factor) / 100);
 		Near_Backward[Motor] = ((((unsigned long) Ref_Time_Backward[Motor]) * Near_Factor) / 100);
 		Slowdown_Forward[Motor] = ((((unsigned long) Ref_Time_Forward[Motor]) * Slowdown_Factor) / 100);
@@ -592,7 +595,7 @@ bool sensorEngaged(sensor) {
 	}
 }
 
-void changeMotorState(byte motor, motor_state state) {
+void changeMotorState(output_group motor, motor_state state) {
 	switch(state) {
 		default:
 		case FAULTED:
@@ -623,7 +626,7 @@ void changeMotorState(byte motor, motor_state state) {
 	return;
 }
 
-void reverseMotor(byte motor) {
+void reverseMotor(output_group motor) {
 	if(getMotorDir(motor) == FORWARD) {
 		setMotorDir(motor, BACKWARD);
 	}

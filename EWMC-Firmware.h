@@ -62,6 +62,14 @@ const byte BUTTON_PIN = 12;
 // ENUMERATIONS
 /////////////////////////
 
+// Power outputs
+typedef enum output_group {
+	ELEVATOR_MOTOR = 0,
+	CART_MOTOR = 1,
+	LOADER_MOTOR = 2,
+	LOADER_MAGNET = 3
+}
+
 // Available sensors
 typedef enum sensor_group {
 	BUTTON = 0,
@@ -178,6 +186,8 @@ void saveCalibrationData(unsigned int ref_time_forward[3], unsigned int ref_time
  * Endstop_Forward[] is also saved.
  *
  * Affects locations 0x000 to 0x011 (inclusive) of EEPROM
+ * INPUT:  Array of forward reference times
+ *         Array of backward reference times
  */
 
 bool sensorEngaged(sensor_group sensor);
@@ -188,7 +198,7 @@ bool sensorEngaged(sensor_group sensor);
  * OUTPUT: State of being engaged
  */
 
-void changeMotorState(byte motor, motor_state state);
+void changeMotorState(output_group motor, motor_state state);
 /*
  * Changes the state of a motor, handling all the tricky bits
  *
@@ -196,6 +206,11 @@ void changeMotorState(byte motor, motor_state state);
  * and changes to direction and speed.
  *
  * Error codes are not flagged by this function.
+ *
+ * Affects Motor_State[], Motor_State_Start[], Endstop_Front[], Endstop_Back[], and state variables
+ * in the power module
+ * INPUT:  Motor to change state (0-indexed)
+ *         State to change to
  */
 
 void assertCriticalError();
@@ -205,12 +220,12 @@ void assertCriticalError();
  * Affects Motor_State[] and Motor_State_Start[]
  */
 
-void reverseMotor(byte motor);
+void reverseMotor(output_group motor);
 /*
  * Reverses the direction of a given motor
  *
  * Affects Endstop_Front[motor] and Endstop_Back[motor]
- * INPUT:  Motor (0-indexed)
+ * INPUT:  Motor to reverse (0-indexed)
  */
 
 
