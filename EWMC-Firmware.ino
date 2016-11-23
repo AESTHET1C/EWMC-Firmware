@@ -25,38 +25,39 @@ unsigned long Audio_Delay_Start = 0;
 unsigned int Audio_Delay_Length = AUDIO_MIN_BUTTON_DELAY;
 
 void setup() {
+
+	// Do some basic MCU initialization
 	readSavedCalibrationData();
 	initInputs();
 	initAudio();
 	initErrors();
 	initPowerOutputs();
 
-	// Don't start if arcade button is pressed
+	// Wait for arcade button to be released
 	while(sensorEngaged(BUTTON)) {
 		// Do nothing
 	}
-
 	delay(DEBOUNCE_DELAY[BUTTON]);
+
+	// Try to get most up-to-date calibration data
 	runCalibration();
 
-	// TODO
-	// Make sure all motors are at ends of movement range
-
-	bool Any_Motor_Swapped = false;
+	// Make sure all motors are in correct state
 	for(byte Motor = 0; Motor < 3; Motor++) {
-		if(sensorEngaged(Endstop_Forward[Motor])) {
-			reverseMotor(Motor);
-			Any_Motor_Swapped = true;
+		if(sensorEngaged(Endstop_Front[Motor])) {
+			changeMotorState(Motor, DELAY_POST_CHANGE);
 		}
-	}
-	if(Any_Motor_Swapped) {
-		delay(RELAY_POST_CHANGE_DELAY);
+		else if(sensorEngaged(Endstop_Back[Motor])) {
+			changeMotorState(Motor, IDLE);
+		}
+		else {
+			changeMotorState(Motor, MOVE_END);
+			setPowerOutput(motor, true);
+		}
 	}
 }
 
 void loop() {
-	// TODO
-
 	for(byte Motor = 0; Motor < 3; Motor++) {
 		switch(Motor_State[Motor]) {
 			case IDLE:
@@ -69,21 +70,31 @@ void loop() {
 				}
 				break;
 			case MOVE_START:
-				if(!sensorEngaged(Endstop_Back[Motor])) {
-					changeMotorState(Motor, MOVE);
-				}
-				else if((millis() - Motor_State_Start[Motor]) >= ((getMotorDir(Motor) == FORWARD) ? Near_Forward[Motor] : Near_Backward[Motor])) {
+				if((millis() - Motor_State_Start[Motor]) >= ((getMotorDir(Motor) == FORWARD) ? Near_Forward[Motor] : Near_Backward[Motor])) {
 					assertCriticalError();
+				}
+				else if(!sensorEngaged(Endstop_Back[Motor])) {
+					changeMotorState(Motor, MOVE);
 				}
 				break;
 			case MOVE:
-				// TODO
-				if((Elapsed_Time) >= ((getMotorDir(Motor) == FORWARD) ? Slowdown_Forward[Motor] : Slowdown_Backward[Motor])) {
+				unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
+
+				if(sensorEngaged(Endstop_Back[Motor]) && (Elapsed_Time >= DEBOUNCE_DELAY[Endstop_Back[Motor]])) {
+					assertCriticalError();
+				}
+				else if(sensorEngaged(Endstop_Front[Motor])) {
+					assertCriticalError();
+				}
+				else if(Elapsed_Time >= ((getMotorDir(Motor) == FORWARD) ? Slowdown_Forward[Motor] : Slowdown_Backward[Motor])) {
 					changeMotorState(Motor, MOVE_END);
 				}
 				break;
 			case MOVE_END:
-				if((Elapsed_Time) >= ((getMotorDir(Motor) == FORWARD) ? Timeout_Forward[Motor] : Timeout_Backward[Motor])) {
+				if(sensorEngaged(Endstop_Back[Motor])) {
+					assertCriticalError();
+				}
+				else if((millis() - Motor_State_Start[Motor]) >= ((getMotorDir(Motor) == FORWARD) ? Timeout_Forward[Motor] : Timeout_Backward[Motor])) {
 					changeMotorState(Motor, SAFETY_REVERSE_ENDSTOP_FAIL);
 					flagError(Endstop_Front[Motor]);
 				}
@@ -137,7 +148,7 @@ void loop() {
 				setPowerOutput(Motor, false);
 				break;
 		}
-		if(sensorEngaged(Endstop_Forward[Motor]) && sensorEngaged(Endstop_Backward[Motor]) && (powerOutputEnabled(Motor) || otherMotorsEnabled(Motor))) {
+		if(sensorEngaged(Endstop_Forward[Motor]) && sensorEngaged(Endstop_Backward[Motor]) && anyMotorEnabled()) {
 			assertCriticalError();
 		}
 	}
@@ -256,7 +267,7 @@ void runCalibration() {
 		}
 	}
 
-	// Stage 1, Step 5: Disengage all endstops
+	// Stage 1, Step 5: Disengage all endstops and press arcade button
 	bool Wait = false;
 	while(Wait) {
 		Wait = false;
@@ -275,19 +286,24 @@ void runCalibration() {
 			Wait = true;
 		}
 
-		handleErrorCodeDisplay();
-		if(sensorEngaged(BUTTON)) {
-			return;
+		if(!sensorEngaged(BUTTON)) {
+			Wait = true;
 		}
+
+		handleErrorCodeDisplay();
 	}
+
+	delay(DEBOUNCE_DELAY[BUTTON]);
+	while(sensorEngaged(BUTTON)){
+		// Do nothing
+	}
+
 	beep();
 
 	// Stage 1, Step 6: Delay to avoid hand crushage
 	unsigned long Cal_Delay_Start = millis();
 	while((millis() - Cal_Delay_Start) < CAL_STAGE_DELAY) {
-		if(sensorEngaged(BUTTON)) {
-			return;
-		}
+		// Do nothing
 	}
 
 	// Stage 2, Step 1: Slowly cycle each motor to endstops
@@ -295,6 +311,7 @@ void runCalibration() {
 	unsigned int Timeout_Backward_Buffer[3];
 	sensor_group Endstop_Forward_Buffer[3] = {ENDSTOP_1, ENDSTOP_3, ENDSTOP_5};
 
+	Motor_State = {INIT, INIT, INIT};
 	setPowerOutput(0, true);
 	Motor_State_Start[0] = millis();
 	setPowerOutput(1, true);
@@ -389,7 +406,7 @@ void runCalibration() {
 					}
 					break;
 			}
-			if(sensorEngaged(Endstop_Forward[Motor]) && sensorEngaged(Endstop_Backward[Motor]) && (powerOutputEnabled(Motor) || otherMotorsEnabled(Motor))) {
+			if(sensorEngaged(Endstop_Forward[Motor]) && sensorEngaged(Endstop_Backward[Motor]) && anyMotorEnabled()) {
 				assertCriticalError();
 			}
 		}
@@ -404,13 +421,13 @@ void runCalibration() {
 	unsigned int Reference_Time_Forward[3];
 	unsigned int Reference_Time_Backward[3];
 
+	Motor_State = {MOVE_START, MOVE_START, MOVE_START};
 	setPowerOutput(0, true);
 	Motor_State_Start[0] = millis();
 	setPowerOutput(1, true);
 	Motor_State_Start[1] = millis();
 	setPowerOutput(2, true);
 	Motor_State_Start[2] = millis();
-	Motor_State = {MOVE_START, MOVE_START, MOVE_START};
 	while(Motor_State != {IDLE, IDLE, IDLE}) {
 		for(byte Motor = 0; Motor < 3; Motor++) {
 			switch(Motor_State[Motor]) {
@@ -481,7 +498,7 @@ void runCalibration() {
 					}
 					break;
 			}
-			if(sensorEngaged(Endstop_Forward[Motor]) && sensorEngaged(Endstop_Backward[Motor]) && (powerOutputEnabled(Motor) || otherMotorsEnabled(Motor))) {
+			if(sensorEngaged(Endstop_Forward[Motor]) && sensorEngaged(Endstop_Backward[Motor]) && anyMotorEnabled()) {
 				assertCriticalError();
 			}
 		}
@@ -577,6 +594,7 @@ bool sensorEngaged(sensor) {
 
 void changeMotorState(byte motor, motor_state state) {
 	switch(state) {
+		default:
 		case FAULTED:
 		case DELAY_PRE_CHANGE:
 			setPowerOutput(motor, false);

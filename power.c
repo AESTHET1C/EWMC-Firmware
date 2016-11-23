@@ -70,9 +70,9 @@ bool powerOutputEnabled(byte output) {
 	return(Power_Output_Enabled[output]);
 }
 
-bool otherMotorsEnabled(byte motor) {
+bool anyMotorEnabled() {
 	for(byte Test_Motor = 0; Test_Motor < 3; Test_Motor++) {
-		if((motor != Test_Motor) && (powerOutputEnabled(Test_Motor))) {
+		if(powerOutputEnabled(Test_Motor)) {
 			return true;
 		}
 	}

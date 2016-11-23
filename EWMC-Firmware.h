@@ -121,7 +121,7 @@ void setup();
  * Initializes all modules and runs calibration routine
  * Runs automatically on program startup
  *
- * TODO
+ * Once calibration is complete, all initial motor states are set, and the main program loop begins.
  */
 
 void loop();
@@ -129,7 +129,12 @@ void loop();
  * Handles the main state machines
  * Automatically loops endlessly after setup()
  *
- * TODO
+ * Global state arrays are used to determine operation of each motor independently of the others.
+ * The clamshell loader's electromagnet is controlled within this state machine, according to
+ * the clamshell loader motor's state.
+ *
+ * Audio state is handled in a similar way, using global state variables. Its operation remains
+ * entirely independent of motor states.
  */
 
 void initInputs();

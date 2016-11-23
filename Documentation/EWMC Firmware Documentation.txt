@@ -23,7 +23,7 @@ SETUP CHECKLIST
 
 CALIBRATION
 
-Note: When re-powering the board without having unplugged anything, no action by the staff is needed. The calibration routine is skipped when the arcade button is pressed before any motors are powered.
+Note: When re-powering the board without having unplugged anything, no action by the staff is needed. The calibration routine is skipped when the arcade button is pressed before step 5 of stage 1.
 
 Calibration is needed whenever endstops or motors have been unplugged since the last power-up. It is used to ensure endstops are plugged in correctly and are working, and to establish sanity checks for normal operation. Upon completion of calibration, these values are stored to non-volatile memory. If calibration is skipped, the last known values are used. The calibration routine is started upon the reset of the EWMC board and has two stages:
 
@@ -32,8 +32,8 @@ Stage 1 - Manual Endstop Engagement:
 	2: Manually engage an endstop (A or B) for the elevator. A beep will play upon successful engagement.
 	3: Manually engage the opposing endstop for the elevator. Two beeps will play upon successful engagement.
 	4: Repeat these steps for the mine cart, then the loader.
-	5: Disengage all endstops. A final beep will play upon completion.
-	6: Remove hands from all motor paths
+	5: Disengage all endstops and press the arcade button. A final beep will play when the button is released.
+	6: Remove hands from all motor paths.
 
 	This stage is used to verify endstops are working and plugged into the correct locations. If an endstop does not beep upon engagement, verify the speaker and endstop are working and plugged into the correct locations. Once this stage is completed, calibration continues to stage 2 after a 3-second delay.
 

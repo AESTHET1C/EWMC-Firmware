@@ -106,12 +106,11 @@ bool powerOutputEnabled(byte output);
  * OUTPUT: State of being enabled
  */
 
-bool otherMotorsEnabled(byte motor);
+bool anyMotorEnabled();
 /*
- * Determines if any other motors are currently moving
+ * Determines if any motor is currently moving
  * Used to determine critical errors
  *
- * INPUT:  Current [known stationary] motor (0-indexed)
  * OUTPUT: Is any other motor enabled?
  */
 
