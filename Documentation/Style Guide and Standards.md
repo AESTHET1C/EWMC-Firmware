@@ -192,7 +192,10 @@ Variables should always specify a type upon declaration.
 
 ---
 
-Constants should not use `#define` statements. A `const` or enumeration should be used instead.
+Constant values should not use `#define` statements. A `const` or enumeration should be used instead.
+An exception may be made when the value must be used by the preprocessor.
+In this case, the defined macro shoud be used minimally, additionally assigning a `const` for all non-preprocessor usage.
+The macro should be prepended with "MACRO_".
 
 ---
 

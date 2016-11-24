@@ -1,7 +1,7 @@
 #include "error.h"
 
-bool Error_Status[ERROR_CODES];
-long Error_Tick_Start;
+bool Error_Status[MACRO_ERROR_CODES];
+unsigned long Error_Tick_Start;
 byte Error_Tick_Curr = 0;        // Current tick within the cycle (0-indexed)
 byte Error_Cycle_Blinks = 0;     // Number of blinks in the current cycle (1-indexed)
 
@@ -12,7 +12,7 @@ void initErrors() {
 }
 
 void handleErrorCodeDisplay() {
-	int Tick_Elapsed_Time = millis() - Error_Tick_Start;
+	unsigned int Tick_Elapsed_Time = millis() - Error_Tick_Start;
 
 	if(Tick_Elapsed_Time >= ERROR_TICK_TIME) {
 		Error_Tick_Curr += 1;
@@ -49,7 +49,7 @@ void clearErrors() {
 	return;
 }
 
-byte getBlinksNext(blinks_prev) {
+byte getBlinksNext(byte blinks_prev) {
 	// TODO
 	// Test this
 	for(byte Blinks_Test = blinks_prev++; Blinks_Test != blinks_prev; Blinks_Test++) {
@@ -61,7 +61,7 @@ byte getBlinksNext(blinks_prev) {
 		}
 	}
 	if((blinks_prev != 0) && Error_Status[blinks_prev - 1]) {
-		return blinks_prev
+		return blinks_prev;
 	}
 	return 0;
 }

@@ -1,3 +1,5 @@
+#include "audio.h"
+
 unsigned long Audio_Start;
 unsigned int Audio_Duration;
 bool Audio_Playing = false;
@@ -14,10 +16,10 @@ void initAudio() {
 	pinMode(SPI_SS_PIN, OUTPUT);
 
 	// Initialize ISD1700 device
-	DigitalWrite(SPI_SS_PIN, LOW);
+	digitalWrite(SPI_SS_PIN, LOW);
 	sendByte(ISD_PU);
 	sendByte(0x00);
-	DigitalWrite(SPI_SS_PIN, HIGH);
+	digitalWrite(SPI_SS_PIN, HIGH);
 	delay(ISD_POWER_UP_DELAY);
 	configAudio(ISD_APC_DEFAULT_CONFIG);
 
@@ -31,7 +33,7 @@ void initISD() {
 void playAudio(audio_clip sound) {
 
 	// Send play command
-	DigitalWrite(SPI_SS_PIN, LOW);
+	digitalWrite(SPI_SS_PIN, LOW);
 	sendByte(ISD_SET_PLAY);
 	sendByte(0x00);
 	sendByte(getByte(ISD_AUDIO_START_PTR[sound], 0));
@@ -39,7 +41,7 @@ void playAudio(audio_clip sound) {
 	sendByte(getByte(ISD_AUDIO_STOP_PTR[sound], 0));
 	sendByte(getByte(ISD_AUDIO_STOP_PTR[sound], 1));
 	sendByte(0x00);
-	DigitalWrite(SPI_SS_PIN, HIGH);
+	digitalWrite(SPI_SS_PIN, HIGH);
 
 	// Update status variables
 	Audio_Start = millis();
@@ -67,19 +69,19 @@ bool audioPlaying() {
 }
 
 void configAudio(uint16_t configuration) {
-	DigitalWrite(SPI_SS_PIN, LOW);
-	sendByte(WR_APC2);
+	digitalWrite(SPI_SS_PIN, LOW);
+	sendByte(ISD_WR_APC2);
 	sendByte(getByte(configuration, 0));
 	sendByte(getByte(configuration, 1));
-	DigitalWrite(SPI_SS_PIN, HIGH);
+	digitalWrite(SPI_SS_PIN, HIGH);
 	return;
 }
 
 void sendByte(uint8_t transmission) {
 	for(byte Bit = 0; Bit < 8; Bit++) {
-		DigitalWrite(SPI_SCLK_PIN, LOW);
-		DigitalWrite(SPI_MOSI_PIN, ((transmission >> Bit) & 0x01));
-		DigitalWrite(SPI_SCLK_PIN, HIGH);
+		digitalWrite(SPI_SCLK_PIN, LOW);
+		digitalWrite(SPI_MOSI_PIN, ((transmission >> Bit) & 0x01));
+		digitalWrite(SPI_SCLK_PIN, HIGH);
 	}
 	return;
 }

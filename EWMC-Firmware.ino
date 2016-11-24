@@ -16,10 +16,10 @@ sensor_group Endstop_Forward[3];    // The expected endstop for each motor, assu
 motor_state Motor_State[3] = {INIT, INIT, INIT};
 unsigned long Motor_State_Start[3] = {0, 0, 0};
 sensor_group Endstop_Front[3];
-sensor_group Endstop_Back{3];
+sensor_group Endstop_Back[3];
 
 // Audio state variables
-audio_state Audio_State = IDLE;
+audio_state Audio_State = WAIT;
 audio_clip Audio_Last_Clip = AUDIO_BEEP;
 unsigned long Audio_Delay_Start = 0;
 unsigned int Audio_Delay_Length = AUDIO_MIN_BUTTON_DELAY;
@@ -42,8 +42,8 @@ void setup() {
 	// Try to get most up-to-date calibration data
 	runCalibration();
 
-	// Make sure all motors are in correct state
-	for(output_group Motor = ELEVATOR_MOTOR; Motor <= LOADER_MOTOR; Motor++) {
+	// Make sure all motors are in correct initial states
+	for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
 		if(sensorEngaged(Endstop_Front[Motor])) {
 			changeMotorState(Motor, DELAY_POST_CHANGE);
 		}
@@ -58,7 +58,7 @@ void setup() {
 }
 
 void loop() {
-	for(output_group Motor = ELEVATOR_MOTOR; Motor <= LOADER_MOTOR; Motor++) {
+	for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
 		switch(Motor_State[Motor]) {
 			case IDLE:
 				if(!sensorEngaged(Endstop_Back[Motor])) {
@@ -163,7 +163,7 @@ void loop() {
 	}
 
 	switch(Audio_State) {
-		case IDLE:
+		case WAIT:
 			if(sensorEngaged(BUTTON)) {
 				Audio_Delay_Length = random(AUDIO_MIN_BUTTON_DELAY, AUDIO_MAX_DELAY);
 				Audio_State = DELAY;
@@ -183,7 +183,7 @@ void loop() {
 					Audio_State = PLAY;
 				}
 				else {
-					Audio_State = IDLE;
+					Audio_State = WAIT;
 				}
 			}
 			break;
@@ -237,7 +237,7 @@ void runCalibration() {
 	}
 
 	// Stage 1, Steps 2-4: Manually engage all endstops group by group
-	for(output_group Motor = ELEVATOR_MOTOR; Motor <= LOADER_MOTOR; Motor++) {
+	for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
 		sensor_group Sensor_Group_Init = Motor + 7;
 		sensor_group Sensor_Group_Next = Sensor_Init + 1;
 		sensor_group Sensor_A = ((Motor * 2) + 1);
@@ -328,7 +328,7 @@ void runCalibration() {
 	setPowerOutput(LOADER_MOTOR, true);
 	Motor_State_Start[LOADER_MOTOR] = millis();
 	while(Motor_State != {IDLE, IDLE, IDLE}) {
-		for(output_group Motor = ELEVATOR_MOTOR; Motor <= LOADER_MOTOR; Motor++) {
+		for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
 			switch(Motor_State[Motor]) {
 				default:
 				case FAULTED:
@@ -438,7 +438,7 @@ void runCalibration() {
 	setPowerOutput(LOADER_MOTOR, true);
 	Motor_State_Start[LOADER_MOTOR] = millis();
 	while(Motor_State != {IDLE, IDLE, IDLE}) {
-		for(output_group Motor = ELEVATOR_MOTOR; Motor <= LOADER_MOTOR; Motor++) {
+		for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
 			switch(Motor_State[Motor]) {
 				default:
 				case FAULTED:
@@ -514,7 +514,7 @@ void runCalibration() {
 	}
 
 	// Calibration complete, update calibration variables
-	for(output_group Motor = ELEVATOR_MOTOR; Motor <= LOADER_MOTOR; Motor++) {
+	for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
 		Near_Forward[Motor] = ((((unsigned long) Reference_Time_Forward[Motor]) * NEAR_FACTOR) / 100);
 		Near_Backward[Motor] = ((((unsigned long) Reference_Time_Backward[Motor]) * NEAR_FACTOR) / 100);
 		Slowdown_Forward[Motor] = ((((unsigned long) Reference_Time_Forward[Motor]) * SLOWDOWN_FACTOR) / 100);
@@ -535,7 +535,7 @@ void readSavedCalibrationData() {
 	byte Near_Factor = EEPROM.read(EEPROM_NEAR_FACTOR_PTR);
 	byte Slowdown_Factor = EEPROM.read(EEPROM_SLOWDOWN_FACTOR_PRT);
 	byte Timeout_Factor = EEPROM.read(EEPROM_TIMEOUT_FACTOR_PTR);
-	for(byte Offset = 0; Offset < 3; Offset++) {
+	for(byte Offset = 0; Offset <= LOADER_MOTOR; Offset++) {
 		Ref_Time_Forward[Offset * 2] = EEPROM.read(EEPROM_REF_FORWARD_PTR + (Offset * 2));
 		Ref_Time_Forward[Offset * 2] += (((unsigned int) EEPROM.read(EEPROM_REF_FORWARD_PTR + (Offset * 2) + 1)) << 8);
 		Ref_Time_Backward[Offset * 2] = EEPROM.read(EEPROM_REF_BACKWARD_PTR + (Offset * 2));
@@ -544,7 +544,7 @@ void readSavedCalibrationData() {
 	}
 
 	// Update calibration variables
-	for(output_group Motor = ELEVATOR_MOTOR; Motor <= LOADER_MOTOR; Motor++) {
+	for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
 		Near_Forward[Motor] = ((((unsigned long) Ref_Time_Forward[Motor]) * Near_Factor) / 100);
 		Near_Backward[Motor] = ((((unsigned long) Ref_Time_Backward[Motor]) * Near_Factor) / 100);
 		Slowdown_Forward[Motor] = ((((unsigned long) Ref_Time_Forward[Motor]) * Slowdown_Factor) / 100);
@@ -557,7 +557,7 @@ void readSavedCalibrationData() {
 }
 
 void saveCalibrationData(unsigned int ref_time_forward[3], unsigned int ref_time_backward[3]) {
-	for(byte Offset = 0; Offset < 3; Offset++) {
+	for(byte Offset = 0; Offset <= LOADER_MOTOR; Offset++) {
 		EEPROM.write((EEPROM_REF_FORWARD_PTR + (Offset * 2)), (ref_time_forward[Offset] & 0xFF));
 		EEPROM.update((EEPROM_REF_FORWARD_PTR + (Offset * 2) + 1), ((ref_time_forward[Offset] >> 8) & 0xFF));
 		EEPROM.write((EEPROM_REF_BACKWARD_PTR + (Offset * 2)), (ref_time_backward[Offset] & 0xFF));
@@ -570,7 +570,7 @@ void saveCalibrationData(unsigned int ref_time_forward[3], unsigned int ref_time
 	return;
 }
 
-bool sensorEngaged(sensor) {
+bool sensorEngaged(sensor_group sensor) {
 	switch(sensor){
 		case BUTTON:
 			return(!digitalRead(BUTTON_PIN));

@@ -23,7 +23,7 @@
 const unsigned int BEEP_DELAY = 500;
 
 // Audio clip durations
-const unsigned int AUDIO_DURATION = {
+const unsigned int AUDIO_DURATION[] = {
 	100,
 	2553,
 	2506,
@@ -46,14 +46,13 @@ const byte SPI_SS_PIN = 8;
 /////////////////////////
 
 // Available audio clips
-typedef enum audio_clip {
+typedef enum {
 	AUDIO_BEEP = 0,
 	AUDIO_EXPLOSION = 1,
 	AUDIO_CANARY = 2,
 	AUDIO_COUGH_1 = 3,
 	AUDIO_COUGH_2 = 4
-};
-
+} audio_clip;
 
 /////////////////////////
 // ISD1700 CONSTANTS
@@ -67,7 +66,7 @@ const byte ISD_WR_APC2 = 0x65;
 const byte ISD_SET_PLAY = 0x80;
 
 // Configuration data
-const uint16_t ISD_APC_DEFAULT_CONFIG = (B00000100 << 8) + B10100000;
+const uint16_t ISD_APC_DEFAULT_CONFIG = ((B00000100 << 8) + B10100000);
 
 // Audio pointer arrays
 const uint16_t ISD_AUDIO_START_PTR[5] = {
@@ -83,7 +82,7 @@ const uint16_t ISD_AUDIO_STOP_PTR[5] = {
 	0x03E,
 	0x046,
 	0x04F
-}
+};
 
 
 /////////////////////////
@@ -101,11 +100,10 @@ void initAudio();
  * Affects Audio_State
  */
 
-void initISD() {
+void initISD();
 /*
  * Initializes the ISD1700 device
  */
-}
 
 void playAudio(audio_clip sound);
 /*

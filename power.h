@@ -37,15 +37,22 @@ const byte MOTOR_DIR_PIN[3] = {4, 5, 6};
 // ENUMERATIONS
 /////////////////////////
 
-typedef enum motor_speed {
+typedef enum {
+	ELEVATOR_MOTOR = 0,
+	CART_MOTOR = 1,
+	LOADER_MOTOR = 2,
+	LOADER_MAGNET = 3
+} output_group;
+
+typedef enum {
 	SLOW,
 	FAST
-}
+} motor_speed;
 
-typedef enum motor_dir {
+typedef enum {
 	FORWARD,
 	BACKWARD
-};
+} motor_dir;
 
 
 /////////////////////////

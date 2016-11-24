@@ -7,11 +7,11 @@ motor_dir Motor_Dir[3];
 void initPowerOutputs() {
 
 	// Prepare PWM outputs
-	for(output_group Output = ELEVATOR_MOTOR; Output <= LOADER_MAGNET; Output++) {
+	for(byte Output = 0; Output <= LOADER_MAGNET; Output++) {
 		Power_Output_Enabled[Output] = false;
 		setPowerOutputPWM(Output, 0);
 	}
-	for(output_group Motor = ELEVATOR_MOTOR; Motor <= LOADER_MOTOR; Motor++) {
+	for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
 		setMotorSpeed(Motor, SLOW);
 	}
 
@@ -22,15 +22,15 @@ void initPowerOutputs() {
 	TCCR2B = B00000110;
 
 	// Prepare direction outputs
-	for(output_group Motor = ELEVATOR_MOTOR; Motor <= LOADER_MOTOR; Motor++) {
+	for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
 		setMotorDir(Motor, FORWARD);
 	}
 
 	// Drive output pins
-	for(output_group Output = ELEVATOR_MOTOR; Output <= LOADER_MAGNET; Output++) {
+	for(byte Output = 0; Output <= LOADER_MAGNET; Output++) {
 		pinMode(POWER_PWM_PIN[Output], OUTPUT);
 	}
-	for(output_group Motor = ELEVATOR_MOTOR; Motor <= LOADER_MOTOR; Motor++) {
+	for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
 		pinMode(MOTOR_DIR_PIN[Motor], OUTPUT);
 	}
 
@@ -71,7 +71,7 @@ bool powerOutputEnabled(output_group output) {
 }
 
 bool anyMotorEnabled() {
-	for(output_group Test_Motor = ELEVATOR_MOTOR; Test_Motor <= LOADER_MOTOR; Test_Motor++) {
+	for(byte Test_Motor = 0; Test_Motor <= LOADER_MOTOR; Test_Motor++) {
 		if(powerOutputEnabled(Test_Motor)) {
 			return true;
 		}

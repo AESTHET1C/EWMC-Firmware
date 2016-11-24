@@ -18,9 +18,9 @@
  *
  * |_________           |_________           |                    |_________           |
  * |         |__________|         |_______________________________|         |__________| and so on...
- * ---blink---
- * ---------tick---------
- * -----------------------------cycle------------------------------
+ *  --blink--            --blink--
+ *  --------tick-------- --------tick-------- --------tick--------
+ * -----------------------------cycle-----------------------------
  *
  * Written by Alex Tavares <tavaresa13@gmail.com>
  */
@@ -33,9 +33,11 @@
 // CONFIGURATION VARIABLES
 /////////////////////////
 
-const byte ERROR_CODES = 10;
-const byte CRITICAL_ERROR = ERROR_CODES;
-const unsigned int ERROR_CYCLE_TIME = 500;
+#define MACRO_ERROR_CODES 10
+
+const byte ERROR_CODES = MACRO_ERROR_CODES;
+const byte CRITICAL_ERROR = MACRO_ERROR_CODES;
+const unsigned int ERROR_TICK_TIME = 500;
 const unsigned int ERROR_BLINK_TIME = 250;
 
 
@@ -88,7 +90,7 @@ void clearErrors();
 // INTERNAL FUNCTIONS
 /////////////////////////
 
-byte getBlinksNext(blinks_prev);
+byte getBlinksNext(byte blinks_prev);
 /*
  * Scans through active errors and determines the next one to display
  * Used by handleErrorCodeDisplay()

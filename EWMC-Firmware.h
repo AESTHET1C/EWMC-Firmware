@@ -14,6 +14,7 @@
 #define main_h
 #include <arduino.h>
 #include <EEPROM.h>
+#include "power.h"
 
 /////////////////////////
 // CONFIGURATION VARIABLES
@@ -62,16 +63,8 @@ const byte BUTTON_PIN = 12;
 // ENUMERATIONS
 /////////////////////////
 
-// Power outputs
-typedef enum output_group {
-	ELEVATOR_MOTOR = 0,
-	CART_MOTOR = 1,
-	LOADER_MOTOR = 2,
-	LOADER_MAGNET = 3
-}
-
 // Available sensors
-typedef enum sensor_group {
+typedef enum {
 	BUTTON = 0,
 	ENDSTOP_1 = 1,
 	ENDSTOP_2 = 2,
@@ -84,10 +77,10 @@ typedef enum sensor_group {
 	ENDSTOP_MOTOR_2 = 9,
 	ENDSTOP_MOTOR_3 = 10,
 	ENDSTOP_ANY = 11
-};
+} sensor_group;
 
 // Motor operation states
-typedef enum motor_state {
+typedef enum {
 	INIT,
 	IDLE,
 	MOVE_START,
@@ -98,14 +91,14 @@ typedef enum motor_state {
 	SAFETY_REVERSE_ENDSTOP_FAIL,
 	SAFETY_REVERSE_ENDSTOP_EARLY,
 	FAULTED
-};
+} motor_state;
 
 // Audio operation states
-typedef enum audio_state {
-	IDLE,
+typedef enum {
+	WAIT,
 	DELAY,
 	PLAY
-}
+} audio_state;
 
 
 /////////////////////////
