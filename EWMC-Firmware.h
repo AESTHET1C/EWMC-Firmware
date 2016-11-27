@@ -15,6 +15,8 @@
 #include <arduino.h>
 #include <EEPROM.h>
 #include "power.h"
+#include "error.h"
+#include "audio.h"
 
 /////////////////////////
 // CONFIGURATION VARIABLES
