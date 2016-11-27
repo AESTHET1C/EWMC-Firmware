@@ -9,10 +9,10 @@ void initPowerOutputs() {
 	// Prepare PWM outputs
 	for(byte Output = 0; Output <= LOADER_MAGNET; Output++) {
 		Power_Output_Enabled[Output] = false;
-		setPowerOutputPWM(Output, 0);
+		setPowerOutputPWM((output_group)Output, 0);
 	}
 	for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
-		setMotorSpeed(Motor, SLOW);
+		setMotorSpeed((output_group)Motor, SLOW);
 	}
 
 	// Configure PWM registers
@@ -23,7 +23,7 @@ void initPowerOutputs() {
 
 	// Prepare direction outputs
 	for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
-		setMotorDir(Motor, FORWARD);
+		setMotorDir((output_group)Motor, FORWARD);
 	}
 
 	// Drive output pins
@@ -72,7 +72,7 @@ bool powerOutputEnabled(output_group output) {
 
 bool anyMotorEnabled() {
 	for(byte Test_Motor = 0; Test_Motor <= LOADER_MOTOR; Test_Motor++) {
-		if(powerOutputEnabled(Test_Motor)) {
+		if(powerOutputEnabled((output_group)Test_Motor)) {
 			return true;
 		}
 	}

@@ -670,12 +670,12 @@ void changeMotorState(output_group motor, motor_state state) {
 	return;
 }
 
-void reverseMotor(byte motor) {
-	if(getMotorDir((output_group)motor) == FORWARD) {
-		setMotorDir((output_group)motor, BACKWARD);
+void reverseMotor(output_group motor) {
+	if(getMotorDir(motor) == FORWARD) {
+		setMotorDir(motor, BACKWARD);
 	}
 	else {
-		setMotorDir((output_group)motor, FORWARD);
+		setMotorDir(motor, FORWARD);
 	}
 	sensor_group Temp_Endstop = Endstop_Front[motor];
 	Endstop_Front[motor] = Endstop_Back[motor];
