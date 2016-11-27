@@ -45,14 +45,14 @@ void setup() {
 	// Make sure all motors are in correct initial states
 	for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
 		if(sensorEngaged(Endstop_Front[Motor])) {
-			changeMotorState(Motor, DELAY_POST_CHANGE);
+			changeMotorState((output_group)Motor, DELAY_POST_CHANGE);
 		}
 		else if(sensorEngaged(Endstop_Back[Motor])) {
-			changeMotorState(Motor, IDLE);
+			changeMotorState((output_group)Motor, IDLE);
 		}
 		else {
-			changeMotorState(Motor, MOVE_END);
-			setPowerOutput(Motor, true);
+			changeMotorState((output_group)Motor, MOVE_END);
+			setPowerOutput((output_group)Motor, true);
 		}
 	}
 }
@@ -60,27 +60,29 @@ void setup() {
 void loop() {
 	for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
 		switch(Motor_State[Motor]) {
-			case IDLE:
+			case IDLE: {
 				if(!sensorEngaged(Endstop_Back[Motor])) {
 					flagError(Endstop_Back[Motor]);
 					Motor_State[Motor] = FAULTED;
 				}
 				else if(sensorEngaged(BUTTON)) {
-					changeMotorState(Motor, MOVE_START);
+					changeMotorState((output_group)Motor, MOVE_START);
 					if(Motor == LOADER_MOTOR) {
 						setPowerOutput(LOADER_MAGNET, true);
 					}
 				}
 				break;
-			case MOVE_START:
-				if((millis() - Motor_State_Start[Motor]) >= ((getMotorDir(Motor) == FORWARD) ? Near_Forward[Motor] : Near_Backward[Motor])) {
+			}
+			case MOVE_START: {
+				if((millis() - Motor_State_Start[Motor]) >= ((getMotorDir((output_group)Motor) == FORWARD) ? Near_Forward[Motor] : Near_Backward[Motor])) {
 					assertCriticalError();
 				}
 				else if(!sensorEngaged(Endstop_Back[Motor])) {
-					changeMotorState(Motor, MOVE);
+					changeMotorState((output_group)Motor, MOVE);
 				}
 				break;
-			case MOVE:
+			}
+			case MOVE: {
 				unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
 
 				if(sensorEngaged(Endstop_Back[Motor]) && (Elapsed_Time >= DEBOUNCE_DELAY[Endstop_Back[Motor]])) {
@@ -89,92 +91,100 @@ void loop() {
 				else if(sensorEngaged(Endstop_Front[Motor])) {
 					assertCriticalError();
 				}
-				else if(Elapsed_Time >= ((getMotorDir(Motor) == FORWARD) ? Slowdown_Forward[Motor] : Slowdown_Backward[Motor])) {
-					changeMotorState(Motor, MOVE_END);
+				else if(Elapsed_Time >= ((getMotorDir((output_group)Motor) == FORWARD) ? Slowdown_Forward[Motor] : Slowdown_Backward[Motor])) {
+					changeMotorState((output_group)Motor, MOVE_END);
 				}
 				break;
-			case MOVE_END:
+			}
+			case MOVE_END: {
 				if(sensorEngaged(Endstop_Back[Motor])) {
 					assertCriticalError();
 				}
-				else if((millis() - Motor_State_Start[Motor]) >= ((getMotorDir(Motor) == FORWARD) ? Timeout_Forward[Motor] : Timeout_Backward[Motor])) {
-					changeMotorState(Motor, SAFETY_REVERSE_ENDSTOP_FAIL);
+				else if((millis() - Motor_State_Start[Motor]) >= ((getMotorDir((output_group)Motor) == FORWARD) ? Timeout_Forward[Motor] : Timeout_Backward[Motor])) {
+					changeMotorState((output_group)Motor, SAFETY_REVERSE_ENDSTOP_FAIL);
 					flagError(Endstop_Front[Motor]);
 				}
 				else if(sensorEngaged(Endstop_Front[Motor])) {
-					changeMotorState(Motor, DELAY_PRE_CHANGE);
+					changeMotorState((output_group)Motor, DELAY_PRE_CHANGE);
 					if(Motor == LOADER_MOTOR) {
 						setPowerOutput(LOADER_MAGNET, false);
 					}
 				}
 				break;
-			case DELAY_PRE_CHANGE:
+			}
+			case DELAY_PRE_CHANGE: {
 				unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
 
 				if((!sensorEngaged(Endstop_Front[Motor])) && (Elapsed_Time >= DEBOUNCE_DELAY[Endstop_Front[Motor]])) {
-					changeMotorState(Motor, FAULTED);
+					changeMotorState((output_group)Motor, FAULTED);
 					flagError(Endstop_Front[Motor]);
 				}
 				else if(Elapsed_Time >= RELAY_PRE_CHANGE_DELAY) {
-					changeMotorState(Motor, DELAY_POST_CHANGE);
+					changeMotorState((output_group)Motor, DELAY_POST_CHANGE);
 				}
 				break;
-			case DELAY_POST_CHANGE:
+			}
+			case DELAY_POST_CHANGE: {
 				if(!sensorEngaged(Endstop_Back[Motor])) {
-					changeMotorState(Motor, FAULTED);
+					changeMotorState((output_group)Motor, FAULTED);
 					flagError(Endstop_Back[Motor]);
 				}
 				else if((millis() - Motor_State_Start[Motor]) >= (RELAY_POST_CHANGE_DELAY + MOTOR_IDLE_DELAY[Motor])) {
-					changeMotorState(Motor, IDLE);
+					changeMotorState((output_group)Motor, IDLE);
 				}
 				break;
-			case SAFETY_REVERSE_ENDSTOP_FAIL:
-				if(sensorEngaged(Motor + ENDSTOP_MOTOR_1)) {
+			}
+			case SAFETY_REVERSE_ENDSTOP_FAIL: {
+				if(sensorEngaged((sensor_group)(Motor + ENDSTOP_MOTOR_1))) {
 					assertCriticalError();
 				}
-				else if((millis() - Motor_State_Start[Motor]) >= ((getMotorDir(Motor) == FORWARD) ? Near_Forward[Motor] : Near_Backward[Motor])) {
-					changeMotorState(Motor, FAULTED);
+				else if((millis() - Motor_State_Start[Motor]) >= ((getMotorDir((output_group)Motor) == FORWARD) ? Near_Forward[Motor] : Near_Backward[Motor])) {
+					changeMotorState((output_group)Motor, FAULTED);
 				}
 				break;
-			case SAFETY_REVERSE_ENDSTOP_EARLY:
+			}
+			case SAFETY_REVERSE_ENDSTOP_EARLY: {
 				if(sensorEngaged(Endstop_Front[Motor])) {
 					assertCriticalError();
 				}
-				else if((millis() - Motor_State_Start[Motor]) >= ((getMotorDir(Motor) == FORWARD) ? Near_Forward[Motor] : Near_Backward[Motor])) {
+				else if((millis() - Motor_State_Start[Motor]) >= ((getMotorDir((output_group)Motor) == FORWARD) ? Near_Forward[Motor] : Near_Backward[Motor])) {
 					if(sensorEngaged(Endstop_Back[Motor])) {
 						assertCriticalError();
 					}
 					else {
-						changeMotorState(Motor, FAULTED);
+						changeMotorState((output_group)Motor, FAULTED);
 					}
 				}
 				break;
+			}
 			default:
-			case FAULTED:
-				setPowerOutput(Motor, false);
+			case FAULTED: {
+				setPowerOutput((output_group)Motor, false);
 				if(Motor == LOADER_MOTOR) {
 					setPowerOutput(LOADER_MAGNET, false);
 				}
 				break;
+			}
 		}
-		if(sensorEngaged(Endstop_Forward[Motor]) && sensorEngaged(Endstop_Backward[Motor]) && anyMotorEnabled()) {
+		if(sensorEngaged(Endstop_Front[Motor]) && sensorEngaged(Endstop_Back[Motor]) && anyMotorEnabled()) {
 			assertCriticalError();
 		}
 	}
 
 	switch(Audio_State) {
-		case WAIT:
+		case WAIT: {
 			if(sensorEngaged(BUTTON)) {
 				Audio_Delay_Length = random(AUDIO_MIN_BUTTON_DELAY, AUDIO_MAX_DELAY);
 				Audio_State = DELAY;
 			}
 			break;
-		case DELAY:
+		}
+		case DELAY: {
 			if((millis() - Audio_Delay_Start) > Audio_Delay_Length) {
 				if(sensorEngaged(BUTTON)) {
 					audio_clip Next_Clip = Audio_Last_Clip;
 					while(Next_Clip != Audio_Last_Clip) {
-						Next_Clip = random(AUDIO_EXPLOSION, AUDIO_COUGH_2);
+						Next_Clip = (audio_clip)random(AUDIO_EXPLOSION, AUDIO_COUGH_2);
 					}
 					playAudio(Next_Clip);
 					Audio_Last_Clip = Next_Clip;
@@ -187,12 +197,14 @@ void loop() {
 				}
 			}
 			break;
-		case PLAY:
+		}
+		case PLAY: {
 			if(!audioPlaying()) {
 				Audio_Delay_Start = millis();
 				Audio_State = DELAY;
 			}
 			break;
+		}
 	}
 
 	handleErrorCodeDisplay();
@@ -211,320 +223,346 @@ void initInputs() {
 
 void runCalibration() {
 
-	// Stage 1, Step 1: Disengage all endstops
-	bool Wait = false;
-	while(Wait) {
-		Wait = false;
-		clearErrorCodes();
+	{  // Stage 1, Step 1: Disengage all endstops
+		bool Wait = false;
+		while(Wait) {
+			Wait = false;
+			clearErrors();
 
-		if(sensorEngaged(ENDSTOP_MOTOR_1)) {
-			flagError(7);
-			Wait = true;
-		}
-		if(sensorEngaged(ENDSTOP_MOTOR_2)) {
-			flagError(8);
-			Wait = true;
-		}
-		if(sensorEngaged(ENDSTOP_MOTOR_3)) {
-			flagError(9);
-			Wait = true;
-		}
-
-		handleErrorCodeDisplay();
-		if(sensorEngaged(BUTTON)) {
-			return;
-		}
-	}
-
-	// Stage 1, Steps 2-4: Manually engage all endstops group by group
-	for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
-		sensor_group Sensor_Group_Init = Motor + 7;
-		sensor_group Sensor_Group_Next = Sensor_Init + 1;
-		sensor_group Sensor_A = ((Motor * 2) + 1);
-		sensor_group Sensor_B = Sensor_A + 1;
-
-		sensor_group Last_Activated_Sensor = Sensor_Group_Init;
-		while(Last_Activated_Sensor != Sensor_Group_Next) {
-			if(Last_Activated_Sensor == Sensor_Group_Init) {
-				if(sensorEngaged(Sensor_A)) {
-					Last_Activated_Sensor = Sensor_A;
-					beep();
-				}
-				else if(sensorEngaged(Sensor_B)) {
-					Last_Activated_Sensor = Sensor_B;
-					beep();
-				}
+			if(sensorEngaged(ENDSTOP_MOTOR_1)) {
+				flagError(7);
+				Wait = true;
 			}
-			else if(Last_Activated_Sensor == Sensor_A) {
-				if(sensorEngaged(Sensor_B)) {
-					Last_Activated_Sensor = Sensor_Group_Next;
-					beep();
-					beep();
-				}
+			if(sensorEngaged(ENDSTOP_MOTOR_2)) {
+				flagError(8);
+				Wait = true;
 			}
-			else {
-				if(sensorEngaged(Sensor_A)) {
-					Last_Activated_Sensor = Sensor_Group_Next;
-					beep();
-					beep();
-				}
+			if(sensorEngaged(ENDSTOP_MOTOR_3)) {
+				flagError(9);
+				Wait = true;
 			}
 
+			handleErrorCodeDisplay();
 			if(sensorEngaged(BUTTON)) {
 				return;
 			}
 		}
 	}
 
-	// Stage 1, Step 5: Disengage all endstops and press arcade button
-	bool Wait = false;
-	while(Wait) {
-		Wait = false;
-		clearErrorCodes();
+	{  // Stage 1, Steps 2-4: Manually engage all endstops group by group
+		for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
+			sensor_group Sensor_Group_Init = (sensor_group)(Motor + 7);
+			sensor_group Sensor_Group_Next = (sensor_group)(Sensor_Group_Init + 1);
+			sensor_group Sensor_A = (sensor_group)((Motor * 2) + 1);
+			sensor_group Sensor_B = (sensor_group)(Sensor_A + 1);
 
-		if(sensorEngaged(ENDSTOP_MOTOR_1)) {
-			flagError(7);
-			Wait = true;
-		}
-		if(sensorEngaged(ENDSTOP_MOTOR_2)) {
-			flagError(8);
-			Wait = true;
-		}
-		if(sensorEngaged(ENDSTOP_MOTOR_3)) {
-			flagError(9);
-			Wait = true;
-		}
+			sensor_group Last_Activated_Sensor = Sensor_Group_Init;
+			while(Last_Activated_Sensor != Sensor_Group_Next) {
+				if(Last_Activated_Sensor == Sensor_Group_Init) {
+					if(sensorEngaged(Sensor_A)) {
+						Last_Activated_Sensor = Sensor_A;
+						beep();
+					}
+					else if(sensorEngaged(Sensor_B)) {
+						Last_Activated_Sensor = Sensor_B;
+						beep();
+					}
+				}
+				else if(Last_Activated_Sensor == Sensor_A) {
+					if(sensorEngaged(Sensor_B)) {
+						Last_Activated_Sensor = Sensor_Group_Next;
+						beep();
+						beep();
+					}
+				}
+				else {
+					if(sensorEngaged(Sensor_A)) {
+						Last_Activated_Sensor = Sensor_Group_Next;
+						beep();
+						beep();
+					}
+				}
 
-		if(!sensorEngaged(BUTTON)) {
-			Wait = true;
+				if(sensorEngaged(BUTTON)) {
+					return;
+				}
+			}
 		}
-
-		handleErrorCodeDisplay();
 	}
 
-	delay(DEBOUNCE_DELAY[BUTTON]);
-	while(sensorEngaged(BUTTON)){
-		// Do nothing
+	{  // Stage 1, Step 5: Disengage all endstops and press arcade button
+		bool Wait = false;
+		while(Wait) {
+			Wait = false;
+			clearErrors();
+
+			if(sensorEngaged(ENDSTOP_MOTOR_1)) {
+				flagError(7);
+				Wait = true;
+			}
+			if(sensorEngaged(ENDSTOP_MOTOR_2)) {
+				flagError(8);
+				Wait = true;
+			}
+			if(sensorEngaged(ENDSTOP_MOTOR_3)) {
+				flagError(9);
+				Wait = true;
+			}
+
+			if(!sensorEngaged(BUTTON)) {
+				Wait = true;
+			}
+
+			handleErrorCodeDisplay();
+		}
+
+		delay(DEBOUNCE_DELAY[BUTTON]);
+		while(sensorEngaged(BUTTON)){
+			// Do nothing
+		}
+
+		beep();
 	}
 
-	beep();
-
-	// Stage 1, Step 6: Delay to avoid hand crushage
-	unsigned long Cal_Delay_Start = millis();
-	while((millis() - Cal_Delay_Start) < CAL_STAGE_DELAY) {
-		// Do nothing
+	{  // Stage 1, Step 6: Delay to avoid hand crushage
+		unsigned long Cal_Delay_Start = millis();
+		while((millis() - Cal_Delay_Start) < CAL_STAGE_DELAY) {
+			// Do nothing
+		}
 	}
 
-	// Stage 2, Step 1: Slowly cycle each motor to endstops
 	unsigned int Timeout_Forward_Buffer[3];
 	unsigned int Timeout_Backward_Buffer[3];
 	sensor_group Endstop_Forward_Buffer[3] = {ENDSTOP_1, ENDSTOP_3, ENDSTOP_5};
 
-	Motor_State = {INIT, INIT, INIT};
-	setPowerOutput(ELEVATOR_MOTOR, true);
-	Motor_State_Start[ELEVATOR_MOTOR] = millis();
-	setPowerOutput(CART_MOTOR, true);
-	Motor_State_Start[CART_MOTOR] = millis();
-	setPowerOutput(LOADER_MOTOR, true);
-	Motor_State_Start[LOADER_MOTOR] = millis();
-	while(Motor_State != {IDLE, IDLE, IDLE}) {
-		for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
-			switch(Motor_State[Motor]) {
-				default:
-				case FAULTED:
-					setPowerOutput(Motor, false);
-					break;
-				case INIT:
-					sensor_group Endstop_X = ((Motor * 2) + ENDSTOP_1);
-					sensor_group Endstop_Y = (Endstop_X + 1);
+	{  // Stage 2, Step 1: Slowly cycle each motor to endstops
+		Motor_State[ELEVATOR_MOTOR] = INIT;
+		setPowerOutput(ELEVATOR_MOTOR, true);
+		Motor_State_Start[ELEVATOR_MOTOR] = millis();
+		Motor_State[CART_MOTOR] = INIT;
+		setPowerOutput(CART_MOTOR, true);
+		Motor_State_Start[CART_MOTOR] = millis();
+		Motor_State[LOADER_MOTOR] = INIT;
+		setPowerOutput(LOADER_MOTOR, true);
+		Motor_State_Start[LOADER_MOTOR] = millis();
+		while((Motor_State[ELEVATOR_MOTOR] != IDLE) || (Motor_State[CART_MOTOR] != IDLE) || (Motor_State[LOADER_MOTOR] != IDLE)) {
+			for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
+				switch(Motor_State[Motor]) {
+					default:
+					case FAULTED: {
+						setPowerOutput((output_group)Motor, false);
+						break;
+					}
+					case INIT: {
+						sensor_group Endstop_X = (sensor_group)((Motor * 2) + ENDSTOP_1);
+						sensor_group Endstop_Y = (sensor_group)(Endstop_X + 1);
 
-					if((millis() - Motor_State_Start[Motor]) >= CAL_TIMEOUT[Motor]) {
-						changeMotorState(Motor, SAFETY_REVERSE_ENDSTOP_FAIL);
-						flagError(Endstop_X);
-						flagError(Endstop_Y);
+						if((millis() - Motor_State_Start[Motor]) >= CAL_TIMEOUT[Motor]) {
+							changeMotorState((output_group)Motor, SAFETY_REVERSE_ENDSTOP_FAIL);
+							flagError(Endstop_X);
+							flagError(Endstop_Y);
+						}
+						else if(sensorEngaged(Endstop_X)) {
+							changeMotorState((output_group)Motor, DELAY_PRE_CHANGE);
+							Endstop_Forward_Buffer[Motor] = Endstop_X;
+							Endstop_Front[Motor] = Endstop_X;
+							Endstop_Back[Motor] = Endstop_Y;
+						}
+						else if(sensorEngaged(Endstop_Y)) {
+							changeMotorState((output_group)Motor, DELAY_PRE_CHANGE);
+							Endstop_Forward_Buffer[Motor] = Endstop_Y;
+							Endstop_Front[Motor] = Endstop_Y;
+							Endstop_Back[Motor] = Endstop_X;
+						}
+						break;
 					}
-					else if(sensorEngaged(Endstop_X)) {
-						changeMotorState(Motor, DELAY_PRE_CHANGE);
-						Endstop_Forward_Buffer[Motor] = Endstop_X;
-						Endstop_Front[Motor] = Endstop_X;
-						Endstop_Back[Motor] = Endstop_Y;
-					}
-					else if(sensorEngaged(Endstop_Y)) {
-						changeMotorState(Motor, DELAY_PRE_CHANGE);
-						Endstop_Forward_Buffer[Motor] = Endstop_Y;
-						Endstop_Front[Motor] = Endstop_Y;
-						Endstop_Back[Motor] = Endstop_X;
-					}
-					break;
-				case DELAY_PRE_CHANGE:
-					unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
+					case DELAY_PRE_CHANGE: {
+						unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
 
-					if((!sensorEngaged(Endstop_Front[Motor])) && (Elapsed_Time >= DEBOUNCE_DELAY[Endstop_Front[Motor]])) {
-						changeMotorState(Motor, FAULTED);
-						flagError(Endstop_Front[Motor]);
+						if((!sensorEngaged(Endstop_Front[Motor])) && (Elapsed_Time >= DEBOUNCE_DELAY[Endstop_Front[Motor]])) {
+							changeMotorState((output_group)Motor, FAULTED);
+							flagError(Endstop_Front[Motor]);
+						}
+						else if(Elapsed_Time >= RELAY_PRE_CHANGE_DELAY) {
+							changeMotorState((output_group)Motor, DELAY_POST_CHANGE);
+						}
+						break;
 					}
-					else if(Elapsed_Time >= RELAY_PRE_CHANGE_DELAY) {
-						changeMotorState(Motor, DELAY_POST_CHANGE);
+					case DELAY_POST_CHANGE: {
+						if(!sensorEngaged(Endstop_Back[Motor])) {
+							changeMotorState((output_group)Motor, FAULTED);
+							flagError(Endstop_Back[Motor]);
+						}
+						else if((millis() - Motor_State_Start[Motor]) >= RELAY_POST_CHANGE_DELAY) {
+							changeMotorState((output_group)Motor, ((getMotorDir((output_group)Motor) == BACKWARD) ? MOVE_START : IDLE));
+						}
+						break;
 					}
-					break;
-				case DELAY_POST_CHANGE:
-					if(!sensorEngaged(Endstop_Back[Motor])) {
-						changeMotorState(Motor, FAULTED);
-						flagError(Endstop_Back[Motor]);
+					case MOVE_START: {
+						if(!sensorEngaged(Endstop_Back[Motor])) {
+							changeMotorState((output_group)Motor, MOVE);
+						}
+						else if((millis() - Motor_State_Start[Motor]) >= CAL_NEAR[Motor]) {
+							assertCriticalError();
+						}
+						break;
 					}
-					else if((millis() - Motor_State_Start[Motor]) >= RELAY_POST_CHANGE_DELAY) {
-						changeMotorState(Motor, ((getMotorDir(Motor) == BACKWARD) ? MOVE_START : IDLE));
-					}
-					break;
-				case MOVE_START:
-					if(!sensorEngaged(Endstop_Back[Motor])) {
-						changeMotorState(Motor, MOVE);
-					}
-					else if((millis() - Motor_State_Start[Motor]) >= CAL_NEAR[Motor]) {
-						assertCriticalError();
-					}
-					break;
-				case MOVE:
-					unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
+					case MOVE: {
+						unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
 
-					if((sensorEngaged(Endstop_Back[Motor])) && (Elapsed_Time >= DEBOUNCE_DELAY[Endstop_Back[Motor]])) {
-						assertCriticalError();
+						if((sensorEngaged(Endstop_Back[Motor])) && (Elapsed_Time >= DEBOUNCE_DELAY[Endstop_Back[Motor]])) {
+							assertCriticalError();
+						}
+						else if(Elapsed_Time >= CAL_TIMEOUT[Motor]) {
+							changeMotorState((output_group)Motor, SAFETY_REVERSE_ENDSTOP_FAIL);
+							flagError(Endstop_Front[Motor]);
+						}
+						else if(sensorEngaged(Endstop_Front[Motor])) {
+							changeMotorState((output_group)Motor, DELAY_PRE_CHANGE);
+							Timeout_Forward_Buffer[Motor] = Elapsed_Time;
+							Timeout_Backward_Buffer[Motor] = Elapsed_Time;
+						}
+						break;
 					}
-					else if(Elapsed_Time >= CAL_TIMEOUT[Motor]) {
-						changeMotorState(Motor, SAFETY_REVERSE_ENDSTOP_FAIL);
-						flagError(Endstop_Front[Motor]);
+					case IDLE: {
+						if(!sensorEngaged(Endstop_Back[Motor])) {
+							flagError(Endstop_Back[Motor]);
+							Motor_State[Motor] = FAULTED;
+						}
+						break;
 					}
-					else if(sensorEngaged(Endstop_Front[Motor])) {
-						changeMotorState(Motor, DELAY_PRE_CHANGE);
-						Timeout_Forward_Buffer[Motor] = Elapsed_Time;
-						Timeout_Backward_Buffer[Motor] = Elapsed_Time;
+					case SAFETY_REVERSE_ENDSTOP_FAIL: {
+						if(sensorEngaged((sensor_group)(Motor + ENDSTOP_MOTOR_1))) {
+							assertCriticalError();
+						}
+						else if((millis() - Motor_State_Start[Motor]) >= CAL_NEAR[Motor]) {
+							changeMotorState((output_group)Motor, FAULTED);
+						}
+						break;
 					}
-					break;
-				case IDLE:
-					if(!sensorEngaged(Endstop_Back[Motor])) {
-						flagError(Endstop_Back[Motor]);
-						Motor_State[Motor] = FAULTED;
-					}
-					break;
-				case SAFETY_REVERSE_ENDSTOP_FAIL:
-					if(sensorEngaged(Motor + ENDSTOP_MOTOR_1)) {
-						assertCriticalError();
-					}
-					else if((millis() - Motor_State_Start[Motor]) >= CAL_NEAR[Motor]) {
-						changeMotorState(Motor, FAULTED);
-					}
-					break;
+				}
+				if(sensorEngaged(Endstop_Front[Motor]) && sensorEngaged(Endstop_Back[Motor]) && anyMotorEnabled()) {
+					assertCriticalError();
+				}
 			}
-			if(sensorEngaged(Endstop_Forward[Motor]) && sensorEngaged(Endstop_Backward[Motor]) && anyMotorEnabled()) {
+
+			handleErrorCodeDisplay();
+			if(sensorEngaged(BUTTON)) {
 				assertCriticalError();
 			}
 		}
-
-		handleErrorCodeDisplay();
-		if(sensorEngaged(BUTTON)) {
-			assertCriticalError();
-		}
 	}
 
-	// Stage 2, Step 2: Quickly cycle each motor to endstops
 	unsigned int Reference_Time_Forward[3];
 	unsigned int Reference_Time_Backward[3];
 
-	Motor_State = {MOVE_START, MOVE_START, MOVE_START};
-	setPowerOutput(ELEVATOR_MOTOR, true);
-	Motor_State_Start[ELEVATOR_MOTOR] = millis();
-	setPowerOutput(CART_MOTOR, true);
-	Motor_State_Start[CART_MOTOR] = millis();
-	setPowerOutput(LOADER_MOTOR, true);
-	Motor_State_Start[LOADER_MOTOR] = millis();
-	while(Motor_State != {IDLE, IDLE, IDLE}) {
-		for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
-			switch(Motor_State[Motor]) {
-				default:
-				case FAULTED:
-					setPowerOutput(Motor, false);
-					break;
-				case MOVE_START:
-					if(!sensorEngaged(Endstop_Back[Motor])) {
-						changeMotorState(Motor, MOVE);
+	{  // Stage 2, Step 2: Quickly cycle each motor to endstops
+		Motor_State[ELEVATOR_MOTOR] = MOVE_START;
+		setPowerOutput(ELEVATOR_MOTOR, true);
+		Motor_State_Start[ELEVATOR_MOTOR] = millis();
+		Motor_State[CART_MOTOR] = MOVE_START;
+		setPowerOutput(CART_MOTOR, true);
+		Motor_State_Start[CART_MOTOR] = millis();
+		Motor_State[LOADER_MOTOR] = MOVE_START;
+		setPowerOutput(LOADER_MOTOR, true);
+		Motor_State_Start[LOADER_MOTOR] = millis();
+		while((Motor_State[ELEVATOR_MOTOR] != IDLE) || (Motor_State[CART_MOTOR] != IDLE) || (Motor_State[LOADER_MOTOR] != IDLE)) {
+			for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
+				switch(Motor_State[Motor]) {
+					default:
+					case FAULTED: {
+						setPowerOutput((output_group)Motor, false);
+						break;
 					}
-					else if((millis() - Motor_State_Start[Motor]) >= CAL_NEAR[Motor]) {
-						assertCriticalError();
-					}
-					break;
-				case MOVE:
-					unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
-
-					if((sensorEngaged(Endstop_Back[Motor])) && (Elapsed_Time >= DEBOUNCE_DELAY[Endstop_Back[Motor]])) {
-						assertCriticalError();
-					}
-					else if(Elapsed_Time >= ((getMotorDir(Motor) == FORWARD) ? Timeout_Forward_Buffer[Motor] : Timeout_Backward_Buffer[Motor])) {
-						changeMotorState(Motor, SAFETY_REVERSE_ENDSTOP_FAIL);
-						flagError(Endstop_Front[Motor]);
-					}
-					else if(sensorEngaged(Endstop_Front[Motor])) {
-						changeMotorState(Motor, DELAY_PRE_CHANGE);
-						if(getMotorDir(Motor) == FORWARD) {
-							Reference_Time_Forward[Motor] = Elapsed_Time;
+					case MOVE_START: {
+						if(!sensorEngaged(Endstop_Back[Motor])) {
+							changeMotorState((output_group)Motor, MOVE);
 						}
-						else {
-							Reference_Time_Backward[Motor] = Elapsed_Time;
+						else if((millis() - Motor_State_Start[Motor]) >= CAL_NEAR[Motor]) {
+							assertCriticalError();
 						}
+						break;
 					}
-					break;
-				case DELAY_PRE_CHANGE:
-					unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
+					case MOVE: {
+						unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
 
-					if((!sensorEngaged(Endstop_Front[Motor])) && (Elapsed_Time >= DEBOUNCE_DELAY[Endstop_Front[Motor]])) {
-						changeMotorState(Motor, FAULTED);
-						flagError(Endstop_Front[Motor]);
+						if((sensorEngaged(Endstop_Back[Motor])) && (Elapsed_Time >= DEBOUNCE_DELAY[Endstop_Back[Motor]])) {
+							assertCriticalError();
+						}
+						else if(Elapsed_Time >= ((getMotorDir((output_group)Motor) == FORWARD) ? Timeout_Forward_Buffer[Motor] : Timeout_Backward_Buffer[Motor])) {
+							changeMotorState((output_group)Motor, SAFETY_REVERSE_ENDSTOP_FAIL);
+							flagError(Endstop_Front[Motor]);
+						}
+						else if(sensorEngaged(Endstop_Front[Motor])) {
+							changeMotorState((output_group)Motor, DELAY_PRE_CHANGE);
+							if(getMotorDir((output_group)Motor) == FORWARD) {
+								Reference_Time_Forward[Motor] = Elapsed_Time;
+							}
+							else {
+								Reference_Time_Backward[Motor] = Elapsed_Time;
+							}
+						}
+						break;
 					}
-					else if(Elapsed_Time >= RELAY_PRE_CHANGE_DELAY) {
-						changeMotorState(Motor, DELAY_POST_CHANGE);
+					case DELAY_PRE_CHANGE: {
+						unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
+
+						if((!sensorEngaged(Endstop_Front[Motor])) && (Elapsed_Time >= DEBOUNCE_DELAY[Endstop_Front[Motor]])) {
+							changeMotorState((output_group)Motor, FAULTED);
+							flagError(Endstop_Front[Motor]);
+						}
+						else if(Elapsed_Time >= RELAY_PRE_CHANGE_DELAY) {
+							changeMotorState((output_group)Motor, DELAY_POST_CHANGE);
+						}
+						break;
 					}
-					break;
-				case DELAY_POST_CHANGE:
-					if(!sensorEngaged(Endstop_Back[Motor])) {
-						changeMotorState(Motor, FAULTED);
-						flagError(Endstop_Back[Motor]);
+					case DELAY_POST_CHANGE: {
+						if(!sensorEngaged(Endstop_Back[Motor])) {
+							changeMotorState((output_group)Motor, FAULTED);
+							flagError(Endstop_Back[Motor]);
+						}
+						else if((millis() - Motor_State_Start[Motor]) >= RELAY_POST_CHANGE_DELAY) {
+							changeMotorState((output_group)Motor, ((getMotorDir((output_group)Motor) == BACKWARD) ? MOVE_START : IDLE));
+						}
+						break;
 					}
-					else if((millis() - Motor_State_Start[Motor]) >= RELAY_POST_CHANGE_DELAY) {
-						changeMotorState(Motor, ((getMotorDir(Motor) == BACKWARD) ? MOVE_START : IDLE));
+					case IDLE: {
+						if(!sensorEngaged(Endstop_Back[Motor])) {
+							flagError(Endstop_Back[Motor]);
+							Motor_State[Motor] = FAULTED;
+						}
+						break;
 					}
-					break;
-				case IDLE:
-					if(!sensorEngaged(Endstop_Back[Motor])) {
-						flagError(Endstop_Back[Motor]);
-						Motor_State[Motor] = FAULTED;
+					case SAFETY_REVERSE_ENDSTOP_FAIL: {
+						if(sensorEngaged((sensor_group)(Motor + ENDSTOP_MOTOR_1))) {
+							assertCriticalError();
+						}
+						else if((millis() - Motor_State_Start[Motor]) >= CAL_NEAR[Motor]) {
+							changeMotorState((output_group)Motor, FAULTED);
+						}
+						break;
 					}
-					break;
-				case SAFETY_REVERSE_ENDSTOP_FAIL:
-					if(sensorEngaged(Motor + ENDSTOP_MOTOR_1)) {
-						assertCriticalError();
-					}
-					else if((millis() - Motor_State_Start[Motor]) >= CAL_NEAR[Motor]) {
-						changeMotorState(Motor, FAULTED);
-					}
-					break;
-			}
-			if(sensorEngaged(Endstop_Forward[Motor]) && sensorEngaged(Endstop_Backward[Motor]) && anyMotorEnabled()) {
-				assertCriticalError();
+				}
+				if(sensorEngaged(Endstop_Front[Motor]) && sensorEngaged(Endstop_Back[Motor]) && anyMotorEnabled()) {
+					assertCriticalError();
+				}
 			}
 		}
 	}
 
-	// Calibration complete, update calibration variables
-	for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
-		Near_Forward[Motor] = ((((unsigned long) Reference_Time_Forward[Motor]) * NEAR_FACTOR) / 100);
-		Near_Backward[Motor] = ((((unsigned long) Reference_Time_Backward[Motor]) * NEAR_FACTOR) / 100);
-		Slowdown_Forward[Motor] = ((((unsigned long) Reference_Time_Forward[Motor]) * SLOWDOWN_FACTOR) / 100);
-		Slowdown_Backward[Motor] = ((((unsigned long) Reference_Time_Backward[Motor]) * SLOWDOWN_FACTOR) / 100);
-		Timeout_Forward[Motor] = ((((unsigned long) Reference_Time_Forward[Motor]) * TIMEOUT_FACTOR) / 100);
-		Timeout_Backward[Motor] = ((((unsigned long) Reference_Time_Backward[Motor]) * TIMEOUT_FACTOR) / 100);
-		Endstop_Forward[Motor] = Endstop_Forward_Buffer[Motor];
+	{  // Calibration complete, update calibration variables
+		for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
+			Near_Forward[Motor] = ((((unsigned long) Reference_Time_Forward[Motor]) * NEAR_FACTOR) / 100);
+			Near_Backward[Motor] = ((((unsigned long) Reference_Time_Backward[Motor]) * NEAR_FACTOR) / 100);
+			Slowdown_Forward[Motor] = ((((unsigned long) Reference_Time_Forward[Motor]) * SLOWDOWN_FACTOR) / 100);
+			Slowdown_Backward[Motor] = ((((unsigned long) Reference_Time_Backward[Motor]) * SLOWDOWN_FACTOR) / 100);
+			Timeout_Forward[Motor] = ((((unsigned long) Reference_Time_Forward[Motor]) * TIMEOUT_FACTOR) / 100);
+			Timeout_Backward[Motor] = ((((unsigned long) Reference_Time_Backward[Motor]) * TIMEOUT_FACTOR) / 100);
+			Endstop_Forward[Motor] = Endstop_Forward_Buffer[Motor];
+		}
+		saveCalibrationData(Reference_Time_Forward, Reference_Time_Backward);
+		return;
 	}
-	saveCalibrationData(Reference_Time_Forward, Reference_Time_Backward);
-	return;
 }
 
 void readSavedCalibrationData() {
@@ -533,14 +571,14 @@ void readSavedCalibrationData() {
 
 	// Read data from EEPROM
 	byte Near_Factor = EEPROM.read(EEPROM_NEAR_FACTOR_PTR);
-	byte Slowdown_Factor = EEPROM.read(EEPROM_SLOWDOWN_FACTOR_PRT);
+	byte Slowdown_Factor = EEPROM.read(EEPROM_SLOWDOWN_FACTOR_PTR);
 	byte Timeout_Factor = EEPROM.read(EEPROM_TIMEOUT_FACTOR_PTR);
 	for(byte Offset = 0; Offset <= LOADER_MOTOR; Offset++) {
 		Ref_Time_Forward[Offset * 2] = EEPROM.read(EEPROM_REF_FORWARD_PTR + (Offset * 2));
 		Ref_Time_Forward[Offset * 2] += (((unsigned int) EEPROM.read(EEPROM_REF_FORWARD_PTR + (Offset * 2) + 1)) << 8);
 		Ref_Time_Backward[Offset * 2] = EEPROM.read(EEPROM_REF_BACKWARD_PTR + (Offset * 2));
 		Ref_Time_Backward[Offset * 2] += (((unsigned int) EEPROM.read(EEPROM_REF_BACKWARD_PTR + (Offset * 2) + 1)) << 8);
-		Endstop_Forward[Offset] = EEPROM.read(EEPROM_ENDSTOP_FORWARD_PTR + Offset);
+		Endstop_Forward[Offset] = (sensor_group)EEPROM.read(EEPROM_ENDSTOP_FORWARD_PTR + Offset);
 	}
 
 	// Update calibration variables
@@ -565,7 +603,7 @@ void saveCalibrationData(unsigned int ref_time_forward[3], unsigned int ref_time
 		EEPROM.update((EEPROM_ENDSTOP_FORWARD_PTR + Offset), Endstop_Forward[Offset]);
 	}
 	EEPROM.update(EEPROM_NEAR_FACTOR_PTR, NEAR_FACTOR);
-	EEPROM.update(EEPROM_SLOWDOWN_FACTOR_PRT, SLOWDOWN_FACTOR);
+	EEPROM.update(EEPROM_SLOWDOWN_FACTOR_PTR, SLOWDOWN_FACTOR);
 	EEPROM.update(EEPROM_TIMEOUT_FACTOR_PTR, TIMEOUT_FACTOR);
 	return;
 }
@@ -635,12 +673,12 @@ void changeMotorState(output_group motor, motor_state state) {
 	return;
 }
 
-void reverseMotor(output_group motor) {
-	if(getMotorDir(motor) == FORWARD) {
-		setMotorDir(motor, BACKWARD);
+void reverseMotor(byte motor) {
+	if(getMotorDir((output_group)motor) == FORWARD) {
+		setMotorDir((output_group)motor, BACKWARD);
 	}
 	else {
-		setMotorDir(motor, FORWARD);
+		setMotorDir((output_group)motor, FORWARD);
 	}
 	sensor_group Temp_Endstop = Endstop_Front[motor];
 	Endstop_Front[motor] = Endstop_Back[motor];
@@ -649,11 +687,15 @@ void reverseMotor(output_group motor) {
 }
 
 void assertCriticalError() {
+	Motor_State[ELEVATOR_MOTOR] = FAULTED;
 	setPowerOutput(ELEVATOR_MOTOR, false);
+	Motor_State_Start[ELEVATOR_MOTOR] = millis();
+	Motor_State[CART_MOTOR] = FAULTED;
 	setPowerOutput(CART_MOTOR, false);
+	Motor_State_Start[CART_MOTOR] = millis();
+	Motor_State[LOADER_MOTOR] = FAULTED;
 	setPowerOutput(LOADER_MOTOR, false);
-	Motor_State_Start[] = {millis(), Motor_State_Start[0], Motor_State_Start[0]};
-	Motor_State[] = {FAULTED, FAULTED, FAULTED};
+	Motor_State_Start[LOADER_MOTOR] = millis();
 	flagError(CRITICAL_ERROR);
 	return;
 }
