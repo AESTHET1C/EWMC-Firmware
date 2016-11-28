@@ -1,3 +1,3 @@
-#Eli Whitney Mine Controller (EWMC) Firmware
+#Eli Whitney Mine Controller ("EWMC") Firmware
 
-To see the expected behavior of the Firmware, see the **Documentation** folder.
+See the **Documentation** folder for details on operation, setup, and hardware.

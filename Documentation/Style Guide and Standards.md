@@ -1,13 +1,10 @@
 #About This Guide
 
-This guide is an attempt to have a single answer as to how this project should be formatted.
-It covers a large range of stylistic decisions, ranging from general file layout to variable naming.
-Both code and documentation of all forms are covered.
+This guide is an attempt to have a single answer as to how this project should be formatted. It covers a large range of stylistic decisions, ranging from general file layout to variable naming. Both code and code documentation are covered. General documentation (such as markdown files) is not specifically covered, but may use this guide as a rough outline.
 
 Since its inception, this guide has also been expanded such that it covers coding standards.
 
-Note that this guide is not intended to be the answer to everything in life; it is purely to keep these files consistent.
-If you disagree with these points, feel free to ignore them for your own projects.
+Note that this guide is not intended to be the answer to everything in life; it is purely to keep these files consistent. If you disagree with these points, feel free to ignore them for your own projects.
 
 
 #General Notes
@@ -23,7 +20,11 @@ Tabs are to be used for indentation and spaces for alignment. There are no excus
 
 ---
 
-An effort should be made to keep all lines in code files under about 100 characters long.
+All files should contain a trailing newline character.
+
+---
+
+An effort should be made to keep all lines under about 100 characters long.
 
 + This assumes a tab width of 2.
 + Lines should be broken on punctuation, if possible.
@@ -32,12 +33,11 @@ An effort should be made to keep all lines in code files under about 100 charact
 
 ---
 
-+ All major sections* should be followed by two empty lines.
-	+ *loosely defined as a top-level section that has a really sweet header
-	+ This should not be followed at the end of the file.
-+ All sections (regardless of hierarchy) should be preceded by one empty line.
-	+ This is, of course, overridden for the section beneath a major section.
-	+ This is also not the case for the first lines of a file.
+Code should be visually broken into logical sections if practical.
+
++ These sections should be separated by a single empty line.
++ Sections may be preceded by an inline comment as a title when needed.
++ Larger code sections should be wrapped in curly braces when practical.
 
 
 #Code Hierarchy Terminology
@@ -45,26 +45,27 @@ An effort should be made to keep all lines in code files under about 100 charact
 Code files can be classified as "main project files", "main library files", or "modules".
 The terms are distinguished by the hierarchy of files and their functionality.
 
- + Modules are files that are co-dependent with other files, either higher or lower in hierarchy.
-  + They contain functions and constants relevant to a general topic.
-  + They are intended to be specific to the project or library they are a part of.
- + A module or group of modules that are not dependent on files outside the group is a library.
-  + A single file within the library should be considered the main library file.
-  	+ This file should contain all functions and constants files outside the library depend on.
-  	+ The header for the main library file should be documented such to represent the library as a whole.
-  + Libraries should be specific to a general topic.
-  + They are intended to be (capable of being) shared across multiple projects.
-  + They should be either located within the project directory (usually in a subdirectory), or in a system-wide shared library directory.
++ Modules are files that are co-dependent with other files, either higher or lower in hierarchy.
+	+ They contain functions and constants relevant to a general topic.
+	+ They are intended to be specific to the project or library they are a part of.
+	+ They should be located within a subdirectory of the containing project or library.
++ A module or group of modules that are not dependent on files outside the group is a library.
+	+ Libraries should deal with some general topic.
+	+ A single file within the library should be considered the main library file.
+		+ This file should not be within a subdirectory of the library.
+		+ This file should contain all functions and constants files outside the library depend on.
+		+ The header for the main library file should be documented such to represent the library as a whole.
+	+ They are capable of being (and are intended to be) shared across multiple projects.
+	+ They should be either located within a subdirectory of the project or in a system-wide shared library directory.
 + The highest level file in a project is the main project file.
-	+ Every project should contain exactly one.
 	+ This file should be capable of being run directly.
 	+ No other file should be exclusively dependent on this file. Co-dependence is acceptable.
 
 ---
 
-+ Every project should have exactly one project file.
++ Every project should have exactly one main project file.
 + Projects may include one or more libraries and/or modules.
-+ Every library should contain one or more modules.
++ Every library contains one or more modules.
 	+ Every library should contain exactly one main library file.
 		+ This file represents the library as a whole.
 		+ This file should contain all functions and constants that may be referenced by files above it in hierarchy.
@@ -77,12 +78,12 @@ All source files should have accompanying headers, regardless of the file hierar
 
 All constants and [non-inline] documentation should be done in header files.
 
-	+ This includes when the values will be used to index arrays. In this case, values should be assigned in the typedef.
-	+ Configuration variables are still constants.
++ This includes when the values will be used to index arrays. In this case, values should be assigned in the typedef.
++ Configuration variables are still constants.
 
 ---
 
-Sections should be in the following order:
+Header files should be broken up into "major sections", in the following order:
 
 1. CONFIGURATION VARIABLES
 2. PIN DEFINITIONS
@@ -90,6 +91,13 @@ Sections should be in the following order:
 4. [other misc sections, as needed]
 5. AVAILABLE FUNCTIONS
 6. INTERNAL FUNCTIONS
+
+Each of these major sections should be followed by two empty lines, and should be labeled like so:
+```C++
+/////////////////////////
+// MAJOR SECTION TITLE
+/////////////////////////
+```
 
 
 #Naming Schemes
@@ -144,15 +152,16 @@ Uncommon or arbitrary abbreviations should only be used if unambiguous in their 
 
 ---
 
-+ Function names should remain unabbreviated if doing so reduces readability. For example:
-	+ "getRecordingDuration()" should not be abbreviated to "getRecDur()".
-	+ "calibrateAudioInput()" should not be abbreviated to "calAudioIn()".
+Function names should remain unabbreviated if doing so reduces readability. For example:
+
++ "getRecordingDuration()" should not be abbreviated to "getRecDur()".
++ "calibrateAudioInput()" should not be abbreviated to "calAudioIn()".
 
 ---
 
 The abbreviations "In" and "Out" should only be used at the end of names.
 
-+ For example, "In_Data" is ambiguous without determining the data type, whereas "Data_In" clearly represents input data.
+For example, "In_Data" is ambiguous without determining the data type, whereas "Data_In" clearly represents input data.
 
 
 #Data Types and Usage
@@ -184,18 +193,17 @@ These data types should not be used:
 ---
 
 Variables should always specify a type upon declaration.
-	+ Variables should be initialized on declaration only if a default value is logical.
-	  For example, if the variable is assigned several lines down by a function that checks for validity and there is no possible branch operation or attempted use of the variable before this assignment, the initial declaration does not need to be initialized.
-	+ Global variables are an exception to this. They should instead be initialized within an initialization routine.
-	+ Type should not be specified on subsequent assignments.
+
++ Variables should be initialized on declaration, assuming a default value is logical and practical.
++ Global variables should be initialized before `loop()` executes.
 + The `typedef` keyword should be used when defining enumerations.
 
 ---
 
 Constant values should not use `#define` statements. A `const` or enumeration should be used instead.
-An exception may be made when the value must be used by the preprocessor.
-In this case, the defined macro shoud be used minimally, additionally assigning a `const` for all non-preprocessor usage.
-The macro should be prepended with "MACRO_".
+
++ An exception may be made when the value must be used by the preprocessor. In this case, the defined macro should be used minimally, additionally assigning a `const` for all non-preprocessor usage.
+	+ The macro should be prepended with "MACRO_".
 
 ---
 
@@ -268,14 +276,3 @@ Inline comments should be in the form:
 + The same format should be kept for "to do" comments within block comments.
 
 ---
-
-Major sections of code should be labeled like so:
-```C++
-/////////////////////////
-// MAJOR SECTION TITLE
-/////////////////////////
-```
-
----
-
-Minor sections of code should be labeled using standard inline comment form, if needed.
