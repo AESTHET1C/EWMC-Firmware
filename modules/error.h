@@ -37,8 +37,8 @@
 
 const byte ERROR_CODES = MACRO_ERROR_CODES;
 const byte CRITICAL_ERROR = MACRO_ERROR_CODES;
-const unsigned int ERROR_TICK_TIME = 500;
-const unsigned int ERROR_BLINK_TIME = 250;
+const unsigned int ERROR_TICK_TIME = 250;
+const unsigned int ERROR_BLINK_TIME = 100;
 
 
 /////////////////////////

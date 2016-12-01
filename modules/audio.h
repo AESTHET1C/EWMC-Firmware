@@ -20,7 +20,7 @@
 // CONFIGURATION VARIABLES
 /////////////////////////
 
-const unsigned int BEEP_DELAY = 500;
+const unsigned int BEEP_DELAY = 150;
 
 // Audio clip durations
 const unsigned int AUDIO_DURATION[] = {
