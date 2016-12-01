@@ -1,9 +1,9 @@
 #include "error.h"
 
 bool Error_Status[MACRO_ERROR_CODES];
-unsigned long Error_Tick_Start;
-byte Error_Tick_Curr = 0;        // Current tick within the cycle (0-indexed)
-byte Error_Cycle_Blinks = 0;     // Number of blinks in the current cycle (1-indexed)
+unsigned long Error_Tick_Start = 0;
+byte Error_Tick_Curr = 0;              // Current tick within the cycle (0-indexed)
+byte Error_Cycle_Blinks = 0;           // Number of blinks in the current cycle (1-indexed)
 
 void initErrors() {
 	clearErrors();

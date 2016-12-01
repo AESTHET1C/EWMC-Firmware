@@ -249,9 +249,9 @@ void runCalibration() {
 
 	{  // Stage 1, Steps 2-4: Manually engage all endstops group by group
 		for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
-			sensor_group Sensor_Group_Init = (sensor_group)(Motor + 7);
+			sensor_group Sensor_Group_Init = (sensor_group)(Motor + ENDSTOP_MOTOR_1);
 			sensor_group Sensor_Group_Next = (sensor_group)(Sensor_Group_Init + 1);
-			sensor_group Sensor_A = (sensor_group)((Motor * 2) + 1);
+			sensor_group Sensor_A = (sensor_group)((Motor * 2) + ENDSTOP_1);
 			sensor_group Sensor_B = (sensor_group)(Sensor_A + 1);
 
 			sensor_group Last_Activated_Sensor = Sensor_Group_Init;

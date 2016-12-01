@@ -31,7 +31,7 @@ This checklist assumes the EWMC board is already screwed to the back of the coal
 
 **Note:** Calibration is required after both initial connection of the board and replacment of components (motors, endstops, etc...) due to failure. No action by the staff is needed when the module is simply powered after having been off overnight.
 
-**Note:** The calibration routine is skipped when the arcade button is pressed before or during step 4 of stage 1.
+**Note:** The calibration routine is skipped when the arcade button is pressed.
 
 Calibration is used to ensure endstops are plugged in correctly and are working, and to establish sanity checks for normal operation. Upon completion of calibration, these values are stored to non-volatile memory. If calibration is skipped, the last known values are used. The calibration routine is started immediately upon the reset of the EWMC board and has two stages:
 
@@ -39,13 +39,13 @@ Calibration is used to ensure endstops are plugged in correctly and are working,
 1. Disengage all endstops. Elevator endstops should be a priority.
 2. Manually engage an endstop (A or B) for the elevator. A beep will play upon successful engagement.
 3. Manually engage the opposing endstop for the elevator. Two beeps will play upon successful engagement.
-4. Repeat steps 2 and 3 for the mine cart, then the loader.
+4. Repeat steps 2 and 3 for the mine cart, then the loader. Once completed, calibration cannot be skipped.
 5. Disengage all endstops and press the arcade button. A final beep will play when the button is released.
 6. Remove hands from all motor paths.
 
 This stage is used to verify endstops are working and plugged into the correct locations. If an endstop does not beep upon engagement, verify the speaker and endstop are working and plugged into the correct locations.
 
-Once this stage is completed, calibration continues to stage 2 after a 3-second delay.
+Calibration continues to stage 2 after a 3-second delay.
 
 ###Stage 2: Automated Calibration:
 
@@ -57,7 +57,7 @@ Once this stage is completed, calibration continues to stage 2 after a 3-second 
 
 This stage determines the locations of each endstop and the average travel time of each motor in both directions. These values are used during normal operation to determine erroneous endstop operation and motor failures.
 
-Once this stage is completed, calibration is complete and the Firmware proceeds to normal operation.
+The Firmware proceeds to normal operation after calibration.
 
 
 #Wiring Connections
@@ -82,7 +82,7 @@ The eight low-power connections are located on the bottom left of the EWMC board
 + Arcade button
 + Speaker
 
-All low-power connections are in non-polarized vertical pairs. Attaching connectors horizontally may cause damage to the EWMC board or the coal mine module. The two endstops for each motor are interchangeable; they will be automatically detected during calibration. If a connector will not plug in fully, check that it is not crooked.
+All low-power connections are in non-polarized vertical pairs. Attaching connectors horizontally may cause damage to the EWMC board or the coal mine module. The two endstops for each motor are interchangeable; they will be automatically detected during calibration.
 
 
 #Error Codes

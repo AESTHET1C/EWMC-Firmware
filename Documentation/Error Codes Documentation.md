@@ -2,7 +2,7 @@
 
 During normal operation, the status (red) LED on the EWMC board remains off. However, if the Firmware detects an error, this LED is used to show the detected error.
 
-Error codes are implemented by blinking the LED, where the number of consecutive blinks determines the error code. Each blink takes one half second, and the error code is repeated every five seconds. Therefore, an error code of 10 will result in a constantly blinking LED.
+Error codes are implemented by blinking the LED, where the number of consecutive blinks determines the error code. Each blink takes one quarter second, and an error code is displayed every two-and-a-half seconds. Therefore, an error code of 10 will result in a constantly blinking LED.
 
 If multiple errors are detected, they will be shown in ascending order.
 
