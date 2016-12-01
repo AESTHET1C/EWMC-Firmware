@@ -30,7 +30,7 @@ const uint8_t PWM_MAGNET = 255;
 /////////////////////////
 
 const byte POWER_PWM_PIN[4] = {9, 10, 11, 3};
-const byte MOTOR_DIR_PIN[3] = {4, 5, 6};
+const byte MOTOR_DIR_PIN[3] = {6, 5, 4};
 
 
 /////////////////////////

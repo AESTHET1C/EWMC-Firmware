@@ -52,12 +52,12 @@ const byte TIMEOUT_FACTOR = 110;  // Percentage of expected travel time before t
 /////////////////////////
 
 // Pin list
-const byte ENDSTOP_1_PIN = A0;
-const byte ENDSTOP_2_PIN = A1;
+const byte ENDSTOP_1_PIN = A5;
+const byte ENDSTOP_2_PIN = A4;
 const byte ENDSTOP_3_PIN = A3;
-const byte ENDSTOP_4_PIN = A4;
-const byte ENDSTOP_5_PIN = A5;
-const byte ENDSTOP_6_PIN = A6;
+const byte ENDSTOP_4_PIN = A2;
+const byte ENDSTOP_5_PIN = A1;
+const byte ENDSTOP_6_PIN = A0;
 const byte BUTTON_PIN = 12;
 
 

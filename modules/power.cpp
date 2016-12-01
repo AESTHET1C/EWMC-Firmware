@@ -82,13 +82,13 @@ bool anyMotorEnabled() {
 void setPowerOutputPWM(output_group power_output, uint8_t pwm) {
 	switch(power_output) {
 		case ELEVATOR_MOTOR:
-			OCR1AL = pwm;
+			OCR2A = pwm;
 			break;
 		case CART_MOTOR:
 			OCR1BL = pwm;
 			break;
 		case LOADER_MOTOR:
-			OCR2A = pwm;
+			OCR1AL = pwm;
 			break;
 		case LOADER_MAGNET:
 			OCR2B = pwm;
