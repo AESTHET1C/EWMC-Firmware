@@ -172,6 +172,7 @@ void loop() {
 		case WAIT: {
 			if(sensorEngaged(BUTTON)) {
 				Audio_Delay_Length = random(AUDIO_MIN_BUTTON_DELAY, AUDIO_MAX_DELAY);
+				Audio_Delay_Start = millis();
 				Audio_State = DELAY;
 			}
 			break;
@@ -180,7 +181,7 @@ void loop() {
 			if((millis() - Audio_Delay_Start) > Audio_Delay_Length) {
 				if(sensorEngaged(BUTTON)) {
 					audio_clip Next_Clip = Audio_Last_Clip;
-					while(Next_Clip != Audio_Last_Clip) {
+					while(Next_Clip == Audio_Last_Clip) {
 						Next_Clip = (audio_clip)random(AUDIO_EXPLOSION, AUDIO_COUGH_2);
 					}
 					playAudio(Next_Clip);
@@ -221,7 +222,7 @@ void initInputs() {
 void runCalibration() {
 
 	{  // Stage 1, Step 1: Disengage all endstops
-		bool Wait = false;
+		bool Wait = true;
 		while(Wait) {
 			Wait = false;
 			clearErrors();
@@ -288,7 +289,7 @@ void runCalibration() {
 	}
 
 	{  // Stage 1, Step 5: Disengage all endstops and press arcade button
-		bool Wait = false;
+		bool Wait = true;
 		while(Wait) {
 			Wait = false;
 			clearErrors();
@@ -544,6 +545,8 @@ void runCalibration() {
 					assertCriticalError();
 				}
 			}
+
+			handleErrorCodeDisplay();
 		}
 	}
 
@@ -660,6 +663,7 @@ void changeMotorState(output_group motor, motor_state state) {
 			break;
 		case IDLE:
 			setMotorSpeed(motor, FAST);
+		case MOVE:
 			break;
 	}
 

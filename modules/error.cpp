@@ -50,18 +50,19 @@ void clearErrors() {
 }
 
 byte getBlinksNext(byte blinks_prev) {
-	// TODO
-	// Test this
-	for(byte Blinks_Test = blinks_prev++; Blinks_Test != blinks_prev; Blinks_Test++) {
-		if(Blinks_Test > ERROR_CODES) {
-			Blinks_Test = 1;
-		}
-		if(Error_Status[Blinks_Test - 1]) {
-			return Blinks_Test;
+	if(blinks_prev < ERROR_CODES) {
+		for(byte Blinks_Test = (blinks_prev + 1); Blinks_Test <= ERROR_CODES; Blinks_Test++) {
+			if(Error_Status[Blinks_Test - 1]) {
+				return Blinks_Test;
+			}
 		}
 	}
-	if((blinks_prev != 0) && Error_Status[blinks_prev - 1]) {
-		return blinks_prev;
+	if(blinks_prev > 0) {
+		for(byte Blinks_Test = 1; Blinks_Test <= blinks_prev; Blinks_Test++) {
+			if(Error_Status[Blinks_Test - 1]) {
+				return Blinks_Test;
+			}
+		}
 	}
 	return 0;
 }
