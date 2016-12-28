@@ -596,10 +596,10 @@ void readSavedCalibrationData() {
 	byte Slowdown_Factor = EEPROM.read(EEPROM_SLOWDOWN_FACTOR_PTR);
 	byte Timeout_Factor = EEPROM.read(EEPROM_TIMEOUT_FACTOR_PTR);
 	for(byte Offset = 0; Offset <= LOADER_MOTOR; Offset++) {
-		Ref_Time_Forward[Offset * 2] = EEPROM.read(EEPROM_REF_FORWARD_PTR + (Offset * 2));
-		Ref_Time_Forward[Offset * 2] += (((unsigned int) EEPROM.read(EEPROM_REF_FORWARD_PTR + (Offset * 2) + 1)) << 8);
-		Ref_Time_Backward[Offset * 2] = EEPROM.read(EEPROM_REF_BACKWARD_PTR + (Offset * 2));
-		Ref_Time_Backward[Offset * 2] += (((unsigned int) EEPROM.read(EEPROM_REF_BACKWARD_PTR + (Offset * 2) + 1)) << 8);
+		Ref_Time_Forward[Offset] = EEPROM.read(EEPROM_REF_FORWARD_PTR + (Offset * 2));
+		Ref_Time_Forward[Offset] += (((unsigned int) EEPROM.read(EEPROM_REF_FORWARD_PTR + (Offset * 2) + 1)) << 8);
+		Ref_Time_Backward[Offset] = EEPROM.read(EEPROM_REF_BACKWARD_PTR + (Offset * 2));
+		Ref_Time_Backward[Offset] += (((unsigned int) EEPROM.read(EEPROM_REF_BACKWARD_PTR + (Offset * 2) + 1)) << 8);
 		Endstop_Forward[Offset] = (sensor_group)EEPROM.read(EEPROM_ENDSTOP_FORWARD_PTR + Offset);
 	}
 
