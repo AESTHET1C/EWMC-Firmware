@@ -100,11 +100,6 @@ void initAudio();
  * Affects Audio_State
  */
 
-void initISD();
-/*
- * Initializes the ISD1700 device
- */
-
 void playAudio(audio_clip sound);
 /*
  * Plays an audio clip without blocking additional code from running

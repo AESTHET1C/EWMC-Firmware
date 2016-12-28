@@ -26,10 +26,6 @@ void initAudio() {
 	return;
 }
 
-void initISD() {
-	return;
-}
-
 void playAudio(audio_clip sound) {
 
 	// Send play command
