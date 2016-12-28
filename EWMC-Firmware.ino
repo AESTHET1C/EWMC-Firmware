@@ -41,6 +41,21 @@ void setup() {
 
 	// Make sure all motors are in correct initial states
 	for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
+
+		// Assign Endstop_Front[] and Endstop_Back[]
+		sensor_group Endstop_X = (sensor_group)((Motor * 2) + ENDSTOP_1);
+		sensor_group Endstop_Y = (sensor_group)(Endstop_X + 1);
+
+		if((Endstop_X == Endstop_Forward[Motor]) != (getMotorDir((output_group)Motor) == BACKWARD)) {
+			Endstop_Front[Motor] = Endstop_X;
+			Endstop_Back[Motor] = Endstop_Y;
+		}
+		else {
+			Endstop_Front[Motor] = Endstop_Y;
+			Endstop_Back[Motor] = Endstop_X;
+		}
+
+		// Set motor states
 		if(sensorEngaged(Endstop_Front[Motor])) {
 			changeMotorState((output_group)Motor, DELAY_POST_CHANGE);
 		}
@@ -87,7 +102,8 @@ void loop() {
 					assertCriticalError();
 				}
 				else if(sensorEngaged(Endstop_Front[Motor])) {
-					assertCriticalError();
+					changeMotorState((output_group)Motor, SAFETY_REVERSE_ENDSTOP_EARLY);
+					flagError(Motor + 7);
 				}
 				else if(Elapsed_Time >= ((getMotorDir((output_group)Motor) == FORWARD) ? Slowdown_Forward[Motor] : Slowdown_Backward[Motor])) {
 					changeMotorState((output_group)Motor, MOVE_END);

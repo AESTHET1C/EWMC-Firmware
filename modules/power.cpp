@@ -14,6 +14,7 @@ void initPowerOutputs() {
 	for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
 		setMotorSpeed((output_group)Motor, SLOW);
 	}
+	Power_Output_PWM[LOADER_MAGNET] = PWM_MAGNET;
 
 	// Configure PWM registers
 	TCCR1A = B10100001;
