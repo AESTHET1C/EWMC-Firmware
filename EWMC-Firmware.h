@@ -145,7 +145,7 @@ void initInputs();
  * Initializes input pins
  * Must be called once at startup
  *
- * Initialization involves pin configuration.
+ * Initialization involves endstop and button pin configuration.
  */
 
 void runCalibration();
@@ -160,13 +160,18 @@ void runCalibration();
  * The calibration routine can be exited at any time by pressing the arcade button.
  * Calibration variables are not altered if the routine is aborted.
  *
- * Affects Timeout_Forward[], Timeout_Backward[], Slowdown_Forward[], Slowdown_Backward[],
- *         Error_10_Forward[], Error_10_Backward[], and Endstop_Forward[]
+ * Affects Near_Forward[], Near_Backward[], Slowdown_Forward[], Slowdown_Backward[],
+ *         Timeout_Forward[], Timeout_Backward[], Endstop_Forward[], Motor_State[],
+ *         Motor_State_Start[], Endstop_Front[], and Endstop_Back[]
  */
 
 void readSavedCalibrationData();
 /*
  * Reads calibration data from EEPROM to global variables
+ *
+ * Global constants are not utilized when recalling stored data. If desired near, slowdown, and
+ * timeout factors were changed since last calibration, calibration must be repeated to update
+ * these values.
  *
  * Affects Near_Forward[], Near_Backward[], Slowdown_Forward[], Slowdown_Backward[],
  *         Timeout_Forward[], Timeout_Backward[], and Endstop_Forward[]
@@ -205,17 +210,9 @@ void changeMotorState(output_group motor, motor_state state);
  *
  * Error codes are not flagged by this function.
  *
- * Affects Motor_State[], Motor_State_Start[], Endstop_Front[], Endstop_Back[], and state variables
- * in the power module
+ * Affects Motor_State[motor], Motor_State_Start[motor], Endstop_Front[motor], and Endstop_Back[motor]
  * INPUT:  Motor to change state (0-indexed)
  *         State to change to
- */
-
-void assertCriticalError();
-/*
- * Flags a critical error and halts all motors
- *
- * Affects Motor_State[] and Motor_State_Start[]
  */
 
 void reverseMotor(output_group motor);
@@ -224,6 +221,13 @@ void reverseMotor(output_group motor);
  *
  * Affects Endstop_Front[motor] and Endstop_Back[motor]
  * INPUT:  Motor to reverse (0-indexed)
+ */
+
+void assertCriticalError();
+/*
+ * Flags a critical error and halts all motors
+ *
+ * Affects Motor_State[] and Motor_State_Start[]
  */
 
 

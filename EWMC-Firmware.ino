@@ -7,13 +7,13 @@ unsigned int Slowdown_Forward[3];   // Time delay for each motor before slowing
 unsigned int Slowdown_Backward[3];
 unsigned int Timeout_Forward[3];    // Emergency timeout for each motor
 unsigned int Timeout_Backward[3];
-sensor_group Endstop_Forward[3];    // The expected endstop for each motor, assuming it travels forward
+sensor_group Endstop_Forward[3];    // The expected endstop for each motor while traveling forward
 
 // Motor state variables
 motor_state Motor_State[3] = {INIT, INIT, INIT};
 unsigned long Motor_State_Start[3] = {0, 0, 0};
-sensor_group Endstop_Front[3];
-sensor_group Endstop_Back[3];
+sensor_group Endstop_Front[3];                    // Relative to current motor direction
+sensor_group Endstop_Back[3];                     // Relative to current motor direction
 
 // Audio state variables
 audio_state Audio_State = WAIT;

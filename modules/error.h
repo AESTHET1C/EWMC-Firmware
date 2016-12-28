@@ -59,7 +59,7 @@ void initErrors();
  *
  * Initialization involves setting status variables and pin configuration.
  *
- * Affects errors[], cycleStart, currentCycle, and currentCycleGoal
+ * Affects Error_Status[]
  */
 
 void handleErrorCodeDisplay();
@@ -67,14 +67,14 @@ void handleErrorCodeDisplay();
  * Updates the EWMC status LED to display error codes
  * Must be placed within a loop that executes regularly
  *
- * Affects cycleStart, currentCycle, and currentCycleGoal
+ * Affects Error_Tick_Start, Error_Tick_Curr, and Error_Cycle_Blinks
  */
 
 void flagError(byte error);
 /*
  * Sets a single error code to true
  *
- * Affects errors[]
+ * Affects Error_Status[]
  * INPUT:  Error code to set (1-indexed)
  */
 
@@ -82,7 +82,7 @@ void clearErrors();
 /*
  * Clears all error codes
  *
- * Affects errors[]
+ * Affects Error_Status[]
  */
 
 
@@ -94,6 +94,8 @@ byte getBlinksNext(byte blinks_prev);
 /*
  * Scans through active errors and determines the next one to display
  * Used by handleErrorCodeDisplay()
+ *
+ * If no errors are flagged, returns 0.
  *
  * INPUT:  Previous displayed error (1-indexed)
  * OUTPUT: Next error to display (1-indexed)

@@ -5,9 +5,8 @@
  * This includes configuring pins on startup, sending SPI commands,
  * and keeping track of playback state.
  *
- * Note that only one audio clip is capable of playing at a time. All audio clips,
- * with the exception of the beep, are expected to be of equal length. If this is not the case,
- * set AUDIO_DURATION to match the longest clip duration.
+ * Note that only one audio clip is capable of playing at a time. Current [estimated] playback
+ * status can be determined using audioPlaying().
  *
  * Written by Alex Tavares <tavaresa13@gmail.com>
  */
@@ -96,15 +95,13 @@ void initAudio();
  *
  * Initialization involves setting status variables and pin configurations.
  * The ISD1700 configuration register is also set.
- *
- * Affects Audio_State
  */
 
 void playAudio(audio_clip sound);
 /*
  * Plays an audio clip without blocking additional code from running
  *
- * Affects Audio_Start, Audio_Duration, and Audio_State
+ * Affects Audio_Start, Audio_Duration, and Audio_Playing
  * INPUT:  Clip to play
  */
 
@@ -121,7 +118,7 @@ bool audioPlaying();
 /*
  * Gets the status of audio playback
  *
- * Affects Audio_State
+ * Affects Audio_Playing
  * OUTPUT: State of audio playing
  */
 
