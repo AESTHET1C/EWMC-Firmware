@@ -50,6 +50,7 @@ void setup() {
 		else {
 			changeMotorState((output_group)Motor, MOVE_END);
 			setPowerOutput((output_group)Motor, true);
+			Motor_State_Start[Motor] = millis();
 		}
 	}
 }
@@ -157,6 +158,7 @@ void loop() {
 			default:
 			case FAULTED: {
 				setPowerOutput((output_group)Motor, false);
+				setMotorDir((output_group)Motor, FORWARD);
 				if(Motor == LOADER_MOTOR) {
 					setPowerOutput(LOADER_MAGNET, false);
 				}
@@ -242,6 +244,7 @@ void runCalibration() {
 
 			handleErrorCodeDisplay();
 			if(sensorEngaged(BUTTON)) {
+				clearErrors();
 				return;
 			}
 		}
@@ -281,6 +284,7 @@ void runCalibration() {
 					}
 				}
 
+				handleErrorCodeDisplay();
 				if(sensorEngaged(BUTTON)) {
 					return;
 				}
@@ -316,7 +320,7 @@ void runCalibration() {
 
 		delay(DEBOUNCE_DELAY[BUTTON]);
 		while(sensorEngaged(BUTTON)){
-			// Do nothing
+			handleErrorCodeDisplay();
 		}
 
 		beep();
@@ -349,6 +353,7 @@ void runCalibration() {
 					default:
 					case FAULTED: {
 						setPowerOutput((output_group)Motor, false);
+						setMotorDir((output_group)Motor, FORWARD);
 						break;
 					}
 					case INIT: {
@@ -470,6 +475,7 @@ void runCalibration() {
 					default:
 					case FAULTED: {
 						setPowerOutput((output_group)Motor, false);
+						setMotorDir((output_group)Motor, FORWARD);
 						break;
 					}
 					case MOVE_START: {

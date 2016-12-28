@@ -14,6 +14,7 @@ The Firmware also utilizes dual endstop sensors per motor along with an optional
 
 
 #Setup Checklist
+
 This checklist assumes the EWMC board is already screwed to the back of the coal mine module, and that all motors and endstops, in addition to the speaker and arcade button connector, are already attached to the board. For information on electrical connections and their locations, see "**Wiring Connections**".
 
 ---
@@ -23,6 +24,7 @@ This checklist assumes the EWMC board is already screwed to the back of the coal
 - [ ] Plug in the clamshell loader's electromagnet
 - [ ] Verify all motors are not at the ends of their movement range (no endstops should be triggered)
 - [ ] Plug in connector D15 to the train table and apply power
+- [ ] Wait for the status LED to finish blinking 4 times
 - [ ] Complete the calibration routine (See "**Calibration**")
 - [ ] Verify proper operation
 
