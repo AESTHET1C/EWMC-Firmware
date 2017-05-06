@@ -1,4 +1,4 @@
-#Overview of the Firmware
+# Overview of the Firmware
 
 The Eli Whitney Mine Controller ("EWMC") is an ATmega 328P-powered board that attaches to the rear of the coal mine module within the Eli Whitney Museum's seasonal train display and controls various features of the module. The EWMC Firmware is specific to both the EWMC board and the coal mine module itself. The Firmware allows public interaction with the coal mine module in the following ways:
 
@@ -13,7 +13,7 @@ The Eli Whitney Mine Controller ("EWMC") is an ATmega 328P-powered board that at
 The Firmware also utilizes dual endstop sensors per motor along with an optional startup calibration routine to prevent potentially erroneous or destructive motor control. In the event that a malfunction does happen, the Firmware will disable the operation of the affected motor and display an error code on the EWMC board's LED.
 
 
-#Setup Checklist
+# Setup Checklist
 
 This checklist assumes the EWMC board is already screwed to the back of the coal mine module, and that all motors and endstops, in addition to the speaker and arcade button connector, are already attached to the board. For information on electrical connections and their locations, see "**Wiring Connections**".
 
@@ -29,7 +29,7 @@ This checklist assumes the EWMC board is already screwed to the back of the coal
 - [ ] Verify proper operation
 
 
-#Calibration
+# Calibration
 
 **Note:** Calibration is required after both initial connection of the board and replacment of components (motors, endstops, etc...) due to failure. No action by the staff is needed when the module is simply powered after having been off overnight.
 
@@ -37,7 +37,7 @@ This checklist assumes the EWMC board is already screwed to the back of the coal
 
 Calibration is used to ensure endstops are plugged in correctly and are working, and to establish sanity checks for normal operation. Upon completion of calibration, these values are stored to non-volatile memory. If calibration is skipped, the last known values are used. The calibration routine is started immediately upon the reset of the EWMC board and has two stages:
 
-###Stage 1: Manual Endstop Engagement
+### Stage 1: Manual Endstop Engagement
 1. Disengage all endstops. Elevator endstops should be a priority.
 2. Manually engage an endstop (A or B) for the elevator. A beep will play upon successful engagement.
 3. Manually engage the opposing endstop for the elevator. Two beeps will play upon successful engagement.
@@ -49,7 +49,7 @@ This stage is used to verify endstops are working and plugged into the correct l
 
 Calibration continues to stage 2 after a 3-second delay.
 
-###Stage 2: Automated Calibration:
+### Stage 2: Automated Calibration:
 
 **Note:** While safety timers are in place, proper motor movement should be verified during this stage. All motors are immediately halted and a critical error is asserted if the arcade button is pressed.
 
@@ -62,7 +62,7 @@ This stage determines the locations of each endstop and the average travel time 
 The Firmware proceeds to normal operation after calibration.
 
 
-#Wiring Connections
+# Wiring Connections
 
 The four high-power connections are located on the bottom right of the EWMC board. From left to right, they are:
 
@@ -87,6 +87,6 @@ The eight low-power connections are located on the bottom left of the EWMC board
 All low-power connections are in non-polarized vertical pairs. Attaching connectors horizontally may cause damage to the EWMC board or the coal mine module. The two endstops for each motor are interchangeable; they will be automatically detected during calibration.
 
 
-#Error Codes
+# Error Codes
 
 See **Error Codes Documentation** for a list of error codes and their operation.
