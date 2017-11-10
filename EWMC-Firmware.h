@@ -14,9 +14,9 @@
 #define main_h
 #include <arduino.h>
 #include <EEPROM.h>
-#include "modules/power.h"
-#include "modules/error.h"
-#include "modules/audio.h"
+#include "src/power.h"
+#include "src/error.h"
+#include "src/audio.h"
 
 /////////////////////////
 // CONFIGURATION VARIABLES
