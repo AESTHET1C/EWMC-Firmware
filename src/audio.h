@@ -57,7 +57,7 @@ typedef enum {
 // ISD1700 CONSTANTS
 /////////////////////////
 
-const byte ISD_POWER_UP_DELAY = 50;
+const byte ISD_POWER_UP_DELAY = 100;
 
 // Commands list
 const byte ISD_PU = 0x01;
@@ -65,7 +65,7 @@ const byte ISD_WR_APC2 = 0x65;
 const byte ISD_SET_PLAY = 0x80;
 
 // Configuration data
-const uint16_t ISD_APC_DEFAULT_CONFIG = ((B00000100 << 8) + B10100000);
+const uint16_t ISD_APC_DEFAULT_CONFIG = ((B00000100 << 8) + B10100010);
 
 // Audio pointer arrays
 const uint16_t ISD_AUDIO_START_PTR[5] = {
