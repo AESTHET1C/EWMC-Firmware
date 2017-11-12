@@ -15,12 +15,10 @@ If multiple errors are detected, they will be shown in ascending order.
 
 ### Trigger Conditions
 + The corresponding motor takes more time than expected to engage the endstop in question
-+ The endstop in question was disengaged while the corresponding motor was stationary
 
 ### Potential Causes
 + The endstop in question has failed
 + The motor in question needs to be re-calibrated
-+ The endstop was disengaged manually
 
 ### Action Taken by Firmware
 + The corresponding motor is reversed briefly if it was in motion
@@ -64,9 +62,7 @@ If multiple errors are detected, they will be shown in ascending order.
 
 ### Trigger Conditions
 + Any pair of endstops engages simultaneously while any motor is active
-+ Any endstop engages while the corresponding motor is traveling in the opposite direction
-	+ Any endstop fails to disengage in a reasonable time while the corresponding motor is traveling in the opposite direction
-+ Either endstop engages while the corresponding motor is reversing during errors 1-6
++ Any endstop fails to disengage in a reasonable time while the corresponding motor is traveling in the opposite direction
 + The arcade button was pressed during stage 2 of calibration
 
 ### Potential Causes
