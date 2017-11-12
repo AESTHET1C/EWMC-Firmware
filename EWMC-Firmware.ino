@@ -396,40 +396,27 @@ void runCalibration() {
 						break;
 					}
 					case DELAY_PRE_CHANGE: {
-						unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
-
-						if((!sensorEngaged(Endstop_Front[Motor])) && (Elapsed_Time >= DEBOUNCE_DELAY[Endstop_Front[Motor]])) {
-							changeMotorState((output_group)Motor, FAULTED);
-							flagError(Endstop_Front[Motor]);
-						}
-						else if(Elapsed_Time >= RELAY_PRE_CHANGE_DELAY) {
+						if((millis() - Motor_State_Start[Motor]) >= RELAY_PRE_CHANGE_DELAY) {
 							changeMotorState((output_group)Motor, DELAY_POST_CHANGE);
 						}
 						break;
 					}
 					case DELAY_POST_CHANGE: {
-						if(!sensorEngaged(Endstop_Back[Motor])) {
-							changeMotorState((output_group)Motor, FAULTED);
-							flagError(Endstop_Back[Motor]);
-						}
-						else if((millis() - Motor_State_Start[Motor]) >= RELAY_POST_CHANGE_DELAY) {
+						if((millis() - Motor_State_Start[Motor]) >= RELAY_POST_CHANGE_DELAY) {
 							changeMotorState((output_group)Motor, ((getMotorDir((output_group)Motor) == BACKWARD) ? MOVE_START : IDLE));
 						}
 						break;
 					}
 					case MOVE_START: {
-						if(!sensorEngaged(Endstop_Back[Motor])) {
+						if((millis() - Motor_State_Start[Motor]) >= CAL_NEAR[Motor]) {
 							changeMotorState((output_group)Motor, MOVE);
-						}
-						else if((millis() - Motor_State_Start[Motor]) >= CAL_NEAR[Motor]) {
-							assertCriticalError();
 						}
 						break;
 					}
 					case MOVE: {
 						unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
 
-						if((sensorEngaged(Endstop_Back[Motor])) && (Elapsed_Time >= DEBOUNCE_DELAY[Endstop_Back[Motor]])) {
+						if(sensorEngaged(Endstop_Back[Motor])) {
 							assertCriticalError();
 						}
 						else if(Elapsed_Time >= CAL_TIMEOUT[Motor]) {
@@ -444,17 +431,10 @@ void runCalibration() {
 						break;
 					}
 					case IDLE: {
-						if(!sensorEngaged(Endstop_Back[Motor])) {
-							flagError(Endstop_Back[Motor]);
-							Motor_State[Motor] = FAULTED;
-						}
 						break;
 					}
 					case SAFETY_REVERSE_ENDSTOP_FAIL: {
-						if(sensorEngaged((sensor_group)(Motor + ENDSTOP_MOTOR_1))) {
-							assertCriticalError();
-						}
-						else if((millis() - Motor_State_Start[Motor]) >= CAL_NEAR[Motor]) {
+						if((millis() - Motor_State_Start[Motor]) >= CAL_NEAR[Motor]) {
 							changeMotorState((output_group)Motor, FAULTED);
 						}
 						break;
@@ -495,21 +475,15 @@ void runCalibration() {
 						break;
 					}
 					case MOVE_START: {
-						if(!sensorEngaged(Endstop_Back[Motor])) {
+						if((millis() - Motor_State_Start[Motor]) >= CAL_NEAR[Motor]) {
 							changeMotorState((output_group)Motor, MOVE);
-						}
-						else if((millis() - Motor_State_Start[Motor]) >= CAL_NEAR[Motor]) {
-							assertCriticalError();
 						}
 						break;
 					}
 					case MOVE: {
 						unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
 
-						if((sensorEngaged(Endstop_Back[Motor])) && (Elapsed_Time >= DEBOUNCE_DELAY[Endstop_Back[Motor]])) {
-							assertCriticalError();
-						}
-						else if(Elapsed_Time >= ((getMotorDir((output_group)Motor) == FORWARD) ? Timeout_Forward_Buffer[Motor] : Timeout_Backward_Buffer[Motor])) {
+						if(Elapsed_Time >= ((getMotorDir((output_group)Motor) == FORWARD) ? Timeout_Forward_Buffer[Motor] : Timeout_Backward_Buffer[Motor])) {
 							changeMotorState((output_group)Motor, SAFETY_REVERSE_ENDSTOP_FAIL);
 							flagError(Endstop_Front[Motor]);
 						}
@@ -525,39 +499,22 @@ void runCalibration() {
 						break;
 					}
 					case DELAY_PRE_CHANGE: {
-						unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
-
-						if((!sensorEngaged(Endstop_Front[Motor])) && (Elapsed_Time >= DEBOUNCE_DELAY[Endstop_Front[Motor]])) {
-							changeMotorState((output_group)Motor, FAULTED);
-							flagError(Endstop_Front[Motor]);
-						}
-						else if(Elapsed_Time >= RELAY_PRE_CHANGE_DELAY) {
+						if((millis() - Motor_State_Start[Motor]) >= RELAY_PRE_CHANGE_DELAY) {
 							changeMotorState((output_group)Motor, DELAY_POST_CHANGE);
 						}
 						break;
 					}
 					case DELAY_POST_CHANGE: {
-						if(!sensorEngaged(Endstop_Back[Motor])) {
-							changeMotorState((output_group)Motor, FAULTED);
-							flagError(Endstop_Back[Motor]);
-						}
-						else if((millis() - Motor_State_Start[Motor]) >= RELAY_POST_CHANGE_DELAY) {
+						if((millis() - Motor_State_Start[Motor]) >= RELAY_POST_CHANGE_DELAY) {
 							changeMotorState((output_group)Motor, ((getMotorDir((output_group)Motor) == BACKWARD) ? MOVE_START : IDLE));
 						}
 						break;
 					}
 					case IDLE: {
-						if(!sensorEngaged(Endstop_Back[Motor])) {
-							flagError(Endstop_Back[Motor]);
-							Motor_State[Motor] = FAULTED;
-						}
 						break;
 					}
 					case SAFETY_REVERSE_ENDSTOP_FAIL: {
-						if(sensorEngaged((sensor_group)(Motor + ENDSTOP_MOTOR_1))) {
-							assertCriticalError();
-						}
-						else if((millis() - Motor_State_Start[Motor]) >= CAL_NEAR[Motor]) {
+						if((millis() - Motor_State_Start[Motor]) >= CAL_NEAR[Motor]) {
 							changeMotorState((output_group)Motor, FAULTED);
 						}
 						break;
@@ -689,7 +646,7 @@ void changeMotorState(output_group motor, motor_state state) {
 			break;
 	}
 
-	if(state != MOVE_END) {
+	if((state != MOVE_END) && (state != MOVE_START)) {
 		Motor_State_Start[motor] = millis();
 	}
 	Motor_State[motor] = state;
