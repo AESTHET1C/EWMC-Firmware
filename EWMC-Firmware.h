@@ -23,7 +23,11 @@
 /////////////////////////
 
 // Debounce and anti-noise configuration
+// SENSOR_REQUIRED_COUNT is the number of consecutive cycles a sensor (or button) must be engaged
+// for it to register
+// This is the prevent electrical noise from falsely triggering endstops and the arcade button
 const unsigned int BUTTON_DEBOUNCE_DELAY = 100;
+const unsigned int SENSOR_REQUIRED_COUNT = 5;
 
 // Motor state delays
 const unsigned int RELAY_PRE_CHANGE_DELAY = 250;

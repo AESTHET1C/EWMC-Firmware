@@ -9,6 +9,9 @@ unsigned int Timeout_Forward[3];    // Emergency timeout for each motor
 unsigned int Timeout_Backward[3];
 sensor_group Endstop_Forward[3];    // The expected endstop for each motor while traveling forward
 
+// Button + endstop engagement cycle counts
+unsigned int Sensor_Count[7] = {0, 0, 0, 0, 0, 0, 0};
+
 // Motor state variables
 motor_state Motor_State[3] = {INIT, INIT, INIT};
 unsigned long Motor_State_Start[3] = {0, 0, 0};
@@ -71,10 +74,21 @@ void setup() {
 }
 
 void loop() {
+	for(byte Sensor = 0; Sensor <= ENDSTOP_6; Sensor++) {
+		if(sensorEngaged(Sensor)) {
+			if(Sensor_Count[Sensor] < SENSOR_REQUIRED_COUNT) {
+				Sensor_Count[Sensor] += 1;
+			}
+		}
+		else {
+			Sensor_Count[Sensor] = 0;
+		}
+	}
+
 	for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
 		switch(Motor_State[Motor]) {
 			case IDLE: {
-				if(sensorEngaged(BUTTON)) {
+				if(Sensor_Count[BUTTON] == SENSOR_REQUIRED_COUNT) {
 					changeMotorState((output_group)Motor, MOVE_START);
 					if(Motor == LOADER_MOTOR) {
 						setPowerOutput(LOADER_MAGNET, true);
@@ -91,10 +105,10 @@ void loop() {
 			case MOVE: {
 				unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
 
-				if(sensorEngaged(Endstop_Back[Motor])) {
+				if(Sensor_Count[Endstop_Back[Motor]] == SENSOR_REQUIRED_COUNT) {
 					assertCriticalError();
 				}
-				else if(sensorEngaged(Endstop_Front[Motor])) {
+				else if(Sensor_Count[Endstop_Front[Motor]] == SENSOR_REQUIRED_COUNT) {
 					changeMotorState((output_group)Motor, SAFETY_REVERSE_ENDSTOP_EARLY);
 					flagError(Motor + 7);
 				}
@@ -104,14 +118,14 @@ void loop() {
 				break;
 			}
 			case MOVE_END: {
-				if(sensorEngaged(Endstop_Back[Motor])) {
+				if(Sensor_Count[Endstop_Back[Motor]] == SENSOR_REQUIRED_COUNT) {
 					assertCriticalError();
 				}
 				else if((millis() - Motor_State_Start[Motor]) >= ((getMotorDir((output_group)Motor) == FORWARD) ? Timeout_Forward[Motor] : Timeout_Backward[Motor])) {
 					changeMotorState((output_group)Motor, SAFETY_REVERSE_ENDSTOP_FAIL);
 					flagError(Endstop_Front[Motor]);
 				}
-				else if(sensorEngaged(Endstop_Front[Motor])) {
+				else if(Sensor_Count[Endstop_Front[Motor]] == SENSOR_REQUIRED_COUNT) {
 					changeMotorState((output_group)Motor, DELAY_PRE_CHANGE);
 					if(Motor == LOADER_MOTOR) {
 						setPowerOutput(LOADER_MAGNET, false);
@@ -139,7 +153,7 @@ void loop() {
 			}
 			case SAFETY_REVERSE_ENDSTOP_EARLY: {
 				if((millis() - Motor_State_Start[Motor]) >= ((getMotorDir((output_group)Motor) == FORWARD) ? Near_Forward[Motor] : Near_Backward[Motor])) {
-					if(sensorEngaged(Endstop_Back[Motor])) {
+					if(Sensor_Count[Endstop_Back[Motor]] == SENSOR_REQUIRED_COUNT) {
 						assertCriticalError();
 					}
 					else {
@@ -158,14 +172,14 @@ void loop() {
 				break;
 			}
 		}
-		if(sensorEngaged(Endstop_Front[Motor]) && sensorEngaged(Endstop_Back[Motor]) && anyMotorEnabled()) {
+		if((Sensor_Count[Endstop_Front[Motor]] == SENSOR_REQUIRED_COUNT) && (Sensor_Count[Endstop_Back[Motor]] == SENSOR_REQUIRED_COUNT) && anyMotorEnabled()) {
 			assertCriticalError();
 		}
 	}
 
 	switch(Audio_State) {
 		case WAIT: {
-			if(sensorEngaged(BUTTON)) {
+			if(Sensor_Count[BUTTON] == SENSOR_REQUIRED_COUNT) {
 				Audio_Delay_Length = random(AUDIO_MIN_BUTTON_DELAY, AUDIO_MAX_DELAY);
 				Audio_Delay_Start = millis();
 				Audio_State = DELAY;
@@ -174,7 +188,7 @@ void loop() {
 		}
 		case DELAY: {
 			if((millis() - Audio_Delay_Start) > Audio_Delay_Length) {
-				if(sensorEngaged(BUTTON)) {
+				if(Sensor_Count[BUTTON] == SENSOR_REQUIRED_COUNT) {
 					audio_clip Next_Clip = Audio_Last_Clip;
 					while(Next_Clip == Audio_Last_Clip) {
 						Next_Clip = (audio_clip)random(AUDIO_EXPLOSION, AUDIO_COUGH_2);
@@ -341,6 +355,17 @@ void runCalibration() {
 		setPowerOutput(LOADER_MOTOR, true);
 		Motor_State_Start[LOADER_MOTOR] = millis();
 		while((Motor_State[ELEVATOR_MOTOR] != IDLE) || (Motor_State[CART_MOTOR] != IDLE) || (Motor_State[LOADER_MOTOR] != IDLE)) {
+			for(byte Sensor = 0; Sensor <= ENDSTOP_6; Sensor++) {
+				if(sensorEngaged(Sensor)) {
+					if(Sensor_Count[Sensor] < SENSOR_REQUIRED_COUNT) {
+						Sensor_Count[Sensor] += 1;
+					}
+				}
+				else {
+					Sensor_Count[Sensor] = 0;
+				}
+			}
+
 			for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
 				switch(Motor_State[Motor]) {
 					default:
@@ -358,13 +383,13 @@ void runCalibration() {
 							flagError(Endstop_X);
 							flagError(Endstop_Y);
 						}
-						else if(sensorEngaged(Endstop_X)) {
+						else if(Sensor_Count[Endstop_X] == SENSOR_REQUIRED_COUNT) {
 							changeMotorState((output_group)Motor, DELAY_PRE_CHANGE);
 							Endstop_Forward_Buffer[Motor] = Endstop_X;
 							Endstop_Front[Motor] = Endstop_X;
 							Endstop_Back[Motor] = Endstop_Y;
 						}
-						else if(sensorEngaged(Endstop_Y)) {
+						else if(Sensor_Count[Endstop_Y] == SENSOR_REQUIRED_COUNT) {
 							changeMotorState((output_group)Motor, DELAY_PRE_CHANGE);
 							Endstop_Forward_Buffer[Motor] = Endstop_Y;
 							Endstop_Front[Motor] = Endstop_Y;
@@ -393,14 +418,14 @@ void runCalibration() {
 					case MOVE: {
 						unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
 
-						if(sensorEngaged(Endstop_Back[Motor])) {
+						if(Sensor_Count[Endstop_Back[Motor]] == SENSOR_REQUIRED_COUNT) {
 							assertCriticalError();
 						}
 						else if(Elapsed_Time >= CAL_TIMEOUT[Motor]) {
 							changeMotorState((output_group)Motor, SAFETY_REVERSE_ENDSTOP_FAIL);
 							flagError(Endstop_Front[Motor]);
 						}
-						else if(sensorEngaged(Endstop_Front[Motor])) {
+						else if(Sensor_Count[Endstop_Front[Motor]] == SENSOR_REQUIRED_COUNT) {
 							changeMotorState((output_group)Motor, DELAY_PRE_CHANGE);
 							Timeout_Forward_Buffer[Motor] = Elapsed_Time;
 							Timeout_Backward_Buffer[Motor] = Elapsed_Time;
@@ -417,7 +442,7 @@ void runCalibration() {
 						break;
 					}
 				}
-				if(sensorEngaged(Endstop_Front[Motor]) && sensorEngaged(Endstop_Back[Motor]) && anyMotorEnabled()) {
+				if((Sensor_Count[Endstop_Front[Motor]] == SENSOR_REQUIRED_COUNT) && (Sensor_Count[Endstop_Back[Motor]] == SENSOR_REQUIRED_COUNT) && anyMotorEnabled()) {
 					assertCriticalError();
 				}
 			}
@@ -443,6 +468,17 @@ void runCalibration() {
 		setPowerOutput(LOADER_MOTOR, true);
 		Motor_State_Start[LOADER_MOTOR] = millis();
 		while((Motor_State[ELEVATOR_MOTOR] != IDLE) || (Motor_State[CART_MOTOR] != IDLE) || (Motor_State[LOADER_MOTOR] != IDLE)) {
+			for(byte Sensor = 0; Sensor <= ENDSTOP_6; Sensor++) {
+				if(sensorEngaged(Sensor)) {
+					if(Sensor_Count[Sensor] < SENSOR_REQUIRED_COUNT) {
+						Sensor_Count[Sensor] += 1;
+					}
+				}
+				else {
+					Sensor_Count[Sensor] = 0;
+				}
+			}
+
 			for(byte Motor = 0; Motor <= LOADER_MOTOR; Motor++) {
 				switch(Motor_State[Motor]) {
 					default:
@@ -464,7 +500,7 @@ void runCalibration() {
 							changeMotorState((output_group)Motor, SAFETY_REVERSE_ENDSTOP_FAIL);
 							flagError(Endstop_Front[Motor]);
 						}
-						else if(sensorEngaged(Endstop_Front[Motor])) {
+						else if(Sensor_Count[Endstop_Front[Motor]] == SENSOR_REQUIRED_COUNT) {
 							changeMotorState((output_group)Motor, DELAY_PRE_CHANGE);
 							if(getMotorDir((output_group)Motor) == FORWARD) {
 								Reference_Time_Forward[Motor] = Elapsed_Time;
@@ -497,7 +533,7 @@ void runCalibration() {
 						break;
 					}
 				}
-				if(sensorEngaged(Endstop_Front[Motor]) && sensorEngaged(Endstop_Back[Motor]) && anyMotorEnabled()) {
+				if((Sensor_Count[Endstop_Front[Motor]] == SENSOR_REQUIRED_COUNT) && (Sensor_Count[Endstop_Back[Motor]] == SENSOR_REQUIRED_COUNT) && anyMotorEnabled()) {
 					assertCriticalError();
 				}
 			}
