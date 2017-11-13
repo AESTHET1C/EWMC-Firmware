@@ -1,6 +1,6 @@
 #include "EWMC-Firmware.h"
 
-// Motor + Endstop calibration variables
+// Motor + endstop calibration variables
 unsigned int Near_Forward[3];       // Time constant for each motor by which endstop should disengage
 unsigned int Near_Backward[3];
 unsigned int Slowdown_Forward[3];   // Time delay for each motor before slowing
@@ -34,7 +34,7 @@ void setup() {
 	while(sensorEngaged(BUTTON)) {
 		// Do nothing
 	}
-	delay(DEBOUNCE_DELAY[BUTTON]);
+	delay(BUTTON_DEBOUNCE_DELAY);
 
 	// Try to get most up-to-date calibration data
 	runCalibration();
@@ -311,7 +311,7 @@ void runCalibration() {
 			handleErrorCodeDisplay();
 		}
 
-		delay(DEBOUNCE_DELAY[BUTTON]);
+		delay(BUTTON_DEBOUNCE_DELAY);
 		while(sensorEngaged(BUTTON)){
 			handleErrorCodeDisplay();
 		}

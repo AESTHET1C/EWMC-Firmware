@@ -22,10 +22,8 @@
 // CONFIGURATION VARIABLES
 /////////////////////////
 
-// Debounce delays of the arcade button and all 6 endstops
-// Follows the order of the enum sensor_group
-// Endstop delays larger than MOTOR_DIR_DELAY_X will be shortened
-const unsigned int DEBOUNCE_DELAY[7] = {100, 50, 50, 50, 50, 50, 50};
+// Debounce and anti-noise configuration
+const unsigned int BUTTON_DEBOUNCE_DELAY = 100;
 
 // Motor state delays
 const unsigned int RELAY_PRE_CHANGE_DELAY = 250;
