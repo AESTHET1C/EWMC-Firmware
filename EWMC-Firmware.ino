@@ -553,6 +553,8 @@ void runCalibration() {
 			Endstop_Forward[Motor] = Endstop_Forward_Buffer[Motor];
 		}
 		saveCalibrationData(Reference_Time_Forward, Reference_Time_Backward);
+		beep();
+		beep();
 		return;
 	}
 }
