@@ -22,7 +22,7 @@
 // PWM presets
 const uint8_t PWM_SPEED_SLOW[3] = {32, 255, 255};
 const uint8_t PWM_SPEED_FAST[3] = {64, 255, 255};
-const uint8_t PWM_MAGNET = 255;
+const uint8_t PWM_MAGNET = 100;
 
 
 /////////////////////////
