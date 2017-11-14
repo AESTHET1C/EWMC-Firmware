@@ -47,6 +47,7 @@ const unsigned int CAL_NEAR[3] = {2500, 2000, 2000};
 const byte NEAR_FACTOR = 10;      // Percentage of expected travel time before no longer near endstop
 const byte SLOWDOWN_FACTOR = 97;  // Percentage of expected travel time before slowing
 const byte TIMEOUT_FACTOR = 125;  // Percentage of expected travel time before timeout
+const unsigned int TIMEOUT_BUFFER = 1000;  // Number of extra milliseconds on top of TIMEOUT_FACTOR
 
 
 /////////////////////////
@@ -115,6 +116,7 @@ uint16_t EEPROM_ENDSTOP_FORWARD_PTR = 0x00C;
 uint16_t EEPROM_NEAR_FACTOR_PTR = 0x00F;
 uint16_t EEPROM_SLOWDOWN_FACTOR_PTR = 0x010;
 uint16_t EEPROM_TIMEOUT_FACTOR_PTR = 0x011;
+uint16_t EEPROM_TIMEOUT_BUFFER_PTR = 0x012;
 
 
 /////////////////////////

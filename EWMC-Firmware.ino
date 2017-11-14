@@ -549,8 +549,8 @@ void runCalibration() {
 			Near_Backward[Motor] = ((((unsigned long) Reference_Time_Backward[Motor]) * NEAR_FACTOR) / 100);
 			Slowdown_Forward[Motor] = ((((unsigned long) Reference_Time_Forward[Motor]) * SLOWDOWN_FACTOR) / 100);
 			Slowdown_Backward[Motor] = ((((unsigned long) Reference_Time_Backward[Motor]) * SLOWDOWN_FACTOR) / 100);
-			Timeout_Forward[Motor] = ((((unsigned long) Reference_Time_Forward[Motor]) * TIMEOUT_FACTOR) / 100);
-			Timeout_Backward[Motor] = ((((unsigned long) Reference_Time_Backward[Motor]) * TIMEOUT_FACTOR) / 100);
+			Timeout_Forward[Motor] = (((((unsigned long) Reference_Time_Forward[Motor]) * TIMEOUT_FACTOR) / 100) + TIMEOUT_BUFFER);
+			Timeout_Backward[Motor] = (((((unsigned long) Reference_Time_Backward[Motor]) * TIMEOUT_FACTOR) / 100) + TIMEOUT_BUFFER);
 			Endstop_Forward[Motor] = Endstop_Forward_Buffer[Motor];
 		}
 		saveCalibrationData(Reference_Time_Forward, Reference_Time_Backward);
@@ -568,11 +568,13 @@ void readSavedCalibrationData() {
 	byte Near_Factor = EEPROM.read(EEPROM_NEAR_FACTOR_PTR);
 	byte Slowdown_Factor = EEPROM.read(EEPROM_SLOWDOWN_FACTOR_PTR);
 	byte Timeout_Factor = EEPROM.read(EEPROM_TIMEOUT_FACTOR_PTR);
+	unsigned int Timeout_Buffer = EEPROM.read(EEPROM_TIMEOUT_BUFFER_PTR);
+	Timeout_Buffer += (((unsigned int) EEPROM.read(EEPROM_TIMEOUT_BUFFER_PTR + 1)) << 8);
 	for(byte Offset = 0; Offset <= LOADER_MOTOR; Offset++) {
 		Ref_Time_Forward[Offset] = EEPROM.read(EEPROM_REF_FORWARD_PTR + (Offset * 2));
-		Ref_Time_Forward[Offset] += (((unsigned int) EEPROM.read(EEPROM_REF_FORWARD_PTR + (Offset * 2) + 1)) << 8);
+		Ref_Time_Forward[Offset] += (((unsigned int) (EEPROM.read(EEPROM_REF_FORWARD_PTR + (Offset * 2) + 1))) << 8);
 		Ref_Time_Backward[Offset] = EEPROM.read(EEPROM_REF_BACKWARD_PTR + (Offset * 2));
-		Ref_Time_Backward[Offset] += (((unsigned int) EEPROM.read(EEPROM_REF_BACKWARD_PTR + (Offset * 2) + 1)) << 8);
+		Ref_Time_Backward[Offset] += (((unsigned int) (EEPROM.read(EEPROM_REF_BACKWARD_PTR + (Offset * 2) + 1))) << 8);
 		Endstop_Forward[Offset] = (sensor_group)EEPROM.read(EEPROM_ENDSTOP_FORWARD_PTR + Offset);
 	}
 
@@ -582,8 +584,8 @@ void readSavedCalibrationData() {
 		Near_Backward[Motor] = ((((unsigned long) Ref_Time_Backward[Motor]) * Near_Factor) / 100);
 		Slowdown_Forward[Motor] = ((((unsigned long) Ref_Time_Forward[Motor]) * Slowdown_Factor) / 100);
 		Slowdown_Backward[Motor] = ((((unsigned long) Ref_Time_Backward[Motor]) * Slowdown_Factor) / 100);
-		Timeout_Forward[Motor] = ((((unsigned long) Ref_Time_Forward[Motor]) * Timeout_Factor) / 100);
-		Timeout_Backward[Motor] = ((((unsigned long) Ref_Time_Backward[Motor]) * Timeout_Factor) / 100);
+		Timeout_Forward[Motor] = (((((unsigned long) Ref_Time_Forward[Motor]) * Timeout_Factor) / 100) + Timeout_Buffer);
+		Timeout_Backward[Motor] = (((((unsigned long) Ref_Time_Backward[Motor]) * Timeout_Factor) / 100) + Timeout_Buffer);
 	}
 
 	return;
@@ -600,6 +602,8 @@ void saveCalibrationData(unsigned int ref_time_forward[3], unsigned int ref_time
 	EEPROM.update(EEPROM_NEAR_FACTOR_PTR, NEAR_FACTOR);
 	EEPROM.update(EEPROM_SLOWDOWN_FACTOR_PTR, SLOWDOWN_FACTOR);
 	EEPROM.update(EEPROM_TIMEOUT_FACTOR_PTR, TIMEOUT_FACTOR);
+	EEPROM.update(EEPROM_TIMEOUT_BUFFER_PTR, (TIMEOUT_BUFFER & 0xFF));
+	EEPROM.update((EEPROM_TIMEOUT_BUFFER_PTR + 1), ((TIMEOUT_BUFFER >> 8) & 0xFF));
 	return;
 }
 
