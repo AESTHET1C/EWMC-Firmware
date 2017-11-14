@@ -41,12 +41,12 @@ const unsigned int AUDIO_MAX_DELAY = 10000;
 const unsigned int AUDIO_MIN_BUTTON_DELAY = 5000;
 
 // Calibration default values
-const unsigned int CAL_TIMEOUT[3] = {50000, 20000, 30000};
-const unsigned int CAL_NEAR[3] = {5000, 2000, 3000};
+const unsigned int CAL_TIMEOUT[3] = {25000, 20000, 20000};
+const unsigned int CAL_NEAR[3] = {2500, 2000, 2000};
 
 const byte NEAR_FACTOR = 10;      // Percentage of expected travel time before no longer near endstop
-const byte SLOWDOWN_FACTOR = 90;  // Percentage of expected travel time before slowing
-const byte TIMEOUT_FACTOR = 115;  // Percentage of expected travel time before timeout
+const byte SLOWDOWN_FACTOR = 97;  // Percentage of expected travel time before slowing
+const byte TIMEOUT_FACTOR = 125;  // Percentage of expected travel time before timeout
 
 
 /////////////////////////
