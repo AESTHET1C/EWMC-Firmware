@@ -661,7 +661,7 @@ void changeMotorState(output_group motor, motor_state state) {
 			break;
 	}
 
-	if((state != MOVE_END) && (state != MOVE_START)) {
+	if((state != MOVE_END) && (state != MOVE)) {
 		Motor_State_Start[motor] = millis();
 	}
 	Motor_State[motor] = state;
