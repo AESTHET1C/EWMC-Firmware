@@ -428,8 +428,8 @@ void runCalibration() {
 						}
 						else if(Sensor_Count[Endstop_Front[Motor]] == SENSOR_REQUIRED_COUNT) {
 							changeMotorState((output_group)Motor, DELAY_PRE_CHANGE);
-							Timeout_Forward_Buffer[Motor] = Elapsed_Time;
-							Timeout_Backward_Buffer[Motor] = Elapsed_Time;
+							Timeout_Forward_Buffer[Motor] = (((((unsigned long) Elapsed_Time) * TIMEOUT_FACTOR) / 100) + TIMEOUT_BUFFER);
+							Timeout_Backward_Buffer[Motor] = (((((unsigned long) Elapsed_Time) * TIMEOUT_FACTOR) / 100) + TIMEOUT_BUFFER);
 						}
 						break;
 					}
