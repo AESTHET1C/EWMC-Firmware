@@ -30,6 +30,14 @@ const unsigned int AUDIO_DURATION[] = {
 	1000
 };
 
+const byte AUDIO_VOLUME[] = {
+	0,
+	0,
+	4,
+	0,
+	0
+};
+
 
 /////////////////////////
 // PIN DEFINITIONS
@@ -100,9 +108,20 @@ void initAudio();
 void playAudio(audio_clip sound);
 /*
  * Plays an audio clip without blocking additional code from running
+ * Defaults to playing at the volume specified in AUDIO_VOLUME[5]
  *
  * Affects Audio_Start, Audio_Duration, and Audio_Playing
  * INPUT:  Clip to play
+ */
+
+void playAudio(audio_clip sound, byte volume);
+/*
+ * Plays an audio clip without blocking additional code from running
+ * Also offers a selection of volume reduction (where 0 = loudest and 8 = quietest)
+ *
+ * Affects Audio_Start, Audio_Duration, and Audio_Playing
+ * INPUT:  Clip to play
+ *         Volume reduction amount (0-8)
  */
 
 void beep();

@@ -27,6 +27,13 @@ void initAudio() {
 }
 
 void playAudio(audio_clip sound) {
+	return playAudio(sound, AUDIO_VOLUME[sound]);
+}
+
+void playAudio(audio_clip sound, byte volume) {
+
+	// Send configuration data to adjust volume
+	configAudio(ISD_APC_DEFAULT_CONFIG + (volume & 0x7));
 
 	// Send play command
 	digitalWrite(SPI_SS_PIN, LOW);
