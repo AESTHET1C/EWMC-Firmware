@@ -67,6 +67,7 @@ void setup() {
 		}
 		else {
 			changeMotorState((output_group)Motor, MOVE_END);
+			setMotorSpeed((output_group) Motor, FAST);
 			setPowerOutput((output_group)Motor, true);
 			Motor_State_Start[Motor] = millis();
 		}
