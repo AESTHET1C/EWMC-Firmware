@@ -121,7 +121,7 @@ void loop() {
 				}
 				else if((millis() - Motor_State_Start[Motor]) >= ((getMotorDir((output_group)Motor) == FORWARD) ? Timeout_Forward[Motor] : Timeout_Backward[Motor])) {
 					changeMotorState((output_group)Motor, SAFETY_REVERSE_ENDSTOP_FAIL);
-					flagError(Endstop_Front[Motor]);
+					flagError(Endstop_Back[Motor]);
 				}
 				else if(Sensor_Count[Endstop_Front[Motor]] == SENSOR_REQUIRED_COUNT) {
 					changeMotorState((output_group)Motor, DELAY_PRE_CHANGE);
