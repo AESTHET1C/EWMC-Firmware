@@ -106,10 +106,7 @@ void loop() {
 			case MOVE: {
 				unsigned int Elapsed_Time = (millis() - Motor_State_Start[Motor]);
 
-				if(Sensor_Count[Endstop_Back[Motor]] == SENSOR_REQUIRED_COUNT) {
-					assertCriticalError();
-				}
-				else if(Sensor_Count[Endstop_Front[Motor]] == SENSOR_REQUIRED_COUNT) {
+				if(Sensor_Count[Endstop_Front[Motor]] == SENSOR_REQUIRED_COUNT) {
 					changeMotorState((output_group)Motor, SAFETY_REVERSE_ENDSTOP_EARLY);
 					flagError(Motor + 7);
 				}
